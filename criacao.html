@@ -120,11 +120,33 @@
       background: var(--surface); border: 1px solid var(--border); color: var(--text);
     }
     .btn-preview:hover { border-color: var(--accent); color: var(--accent); }
-    .btn-send {
-      background: var(--accent); color: #fff;
-      box-shadow: 0 4px 20px var(--accent-glow);
+    .btn-share { background: var(--accent); color: #fff; box-shadow: 0 4px 20px var(--accent-glow); }
+    .btn-share:hover { filter: brightness(1.1); transform: translateY(-1px); }
+    .share-wrapper { position: relative; display: inline-flex; }
+    .share-menu {
+      display: none; position: absolute; bottom: calc(100% + 8px); right: 0;
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 14px; padding: 6px; min-width: 252px;
+      z-index: 500; box-shadow: 0 8px 32px rgba(0,0,0,.5);
     }
-    .btn-send:hover { filter: brightness(1.1); transform: translateY(-1px); }
+    .share-menu.open { display: block; }
+    .share-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 10px 12px; border-radius: 9px; cursor: pointer;
+      color: var(--text); border: none; background: none;
+      width: 100%; font-family: inherit; transition: background .15s; text-align: left;
+    }
+    .share-item:hover { background: var(--surface); }
+    .share-icon { width: 34px; height: 34px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .share-label { font-weight: 600; font-size: .88rem; }
+    .share-sublabel { font-size: .75rem; color: var(--muted); margin-top: 1px; }
+    #printContent { display: none; }
+    @media print {
+      .topbar, form, .form-actions, .modal-overlay, .toast, .responsible-card, .page-header { display: none !important; }
+      .page { max-width: 100%; padding: 20px; }
+      #printContent { display: block !important; white-space: pre-wrap; font-family: monospace; font-size: 12px; line-height: 1.7; color: #000; }
+      body { background: #fff !important; color: #000 !important; }
+    }
 
     /* MODAL */
     .modal-overlay {
@@ -385,10 +407,30 @@
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
         Visualizar e-mail
       </button>
-      <button type="button" class="btn btn-send" onclick="sendEmail()">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-        Enviar briefing
-      </button>
+      <div class="share-wrapper">
+        <button type="button" class="btn btn-share" onclick="toggleShareMenu(event)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+          Compartilhar
+        </button>
+        <div class="share-menu" id="shareMenu">
+          <button class="share-item" onclick="shareOutlook()">
+            <div class="share-icon" style="background:#0078d4"><svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg></div>
+            <div><div class="share-label">Outlook</div><div class="share-sublabel">Enviar por e-mail</div></div>
+          </button>
+          <button class="share-item" onclick="shareGmail()">
+            <div class="share-icon" style="background:#ea4335"><svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm-9 8.5L4 8V6.5l7 4.5 7-4.5V8l-7 4.5z"/></svg></div>
+            <div><div class="share-label">Gmail</div><div class="share-sublabel">Enviar por e-mail</div></div>
+          </button>
+          <button class="share-item" onclick="shareWhatsApp()">
+            <div class="share-icon" style="background:#25d366"><svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></div>
+            <div><div class="share-label">Mensagem</div><div class="share-sublabel">Compartilhar via WhatsApp</div></div>
+          </button>
+          <button class="share-item" onclick="savePDF()">
+            <div class="share-icon" style="background:#ef4444"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div>
+            <div><div class="share-label">Salvar como PDF</div><div class="share-sublabel">Exportar briefing</div></div>
+          </button>
+        </div>
+      </div>
     </div>
   </form>
 </div>
@@ -403,15 +445,36 @@
     <div class="email-box" id="emailPreview"></div>
     <div class="modal-actions">
       <button class="btn btn-preview" onclick="closePreview()">Fechar</button>
-      <button class="btn btn-send" onclick="sendEmail()">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-        Enviar agora
-      </button>
+      <div class="share-wrapper">
+        <button class="btn btn-share" onclick="toggleShareMenuModal(event)">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+          Compartilhar
+        </button>
+        <div class="share-menu" id="shareMenuModal">
+          <button class="share-item" onclick="shareOutlook()">
+            <div class="share-icon" style="background:#0078d4"><svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg></div>
+            <div><div class="share-label">Outlook</div><div class="share-sublabel">Enviar por e-mail</div></div>
+          </button>
+          <button class="share-item" onclick="shareGmail()">
+            <div class="share-icon" style="background:#ea4335"><svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm-9 8.5L4 8V6.5l7 4.5 7-4.5V8l-7 4.5z"/></svg></div>
+            <div><div class="share-label">Gmail</div><div class="share-sublabel">Enviar por e-mail</div></div>
+          </button>
+          <button class="share-item" onclick="shareWhatsApp()">
+            <div class="share-icon" style="background:#25d366"><svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></div>
+            <div><div class="share-label">Mensagem</div><div class="share-sublabel">Compartilhar via WhatsApp</div></div>
+          </button>
+          <button class="share-item" onclick="savePDF()">
+            <div class="share-icon" style="background:#ef4444"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div>
+            <div><div class="share-label">Salvar como PDF</div><div class="share-sublabel">Exportar briefing</div></div>
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 </div>
 
 <!-- TOAST -->
+<div id="printContent"></div>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -562,13 +625,56 @@ Acompanhe sua solicitação com o protocolo: ${protocol}`;
     document.getElementById('modalOverlay').classList.remove('open');
   }
 
-  function sendEmail() {
+  function buildSubjectArt() {
+    return encodeURIComponent(`[Criação] ${protocol} – ${val('projeto') || 'Nova solicitação'}`);
+  }
+
+  function toggleShareMenu(e) {
+    e.stopPropagation();
     if (!validateRequired()) return;
-    const subject = encodeURIComponent(`[Criação] ${protocol} – ${val('projeto') || 'Nova solicitação'}`);
+    document.getElementById('shareMenu').classList.toggle('open');
+    document.getElementById('shareMenuModal').classList.remove('open');
+  }
+
+  function toggleShareMenuModal(e) {
+    e.stopPropagation();
+    document.getElementById('shareMenuModal').classList.toggle('open');
+    document.getElementById('shareMenu').classList.remove('open');
+  }
+
+  function closeAllShareMenus() {
+    document.getElementById('shareMenu').classList.remove('open');
+    document.getElementById('shareMenuModal').classList.remove('open');
+  }
+
+  document.addEventListener('click', closeAllShareMenus);
+
+  function shareOutlook() {
     const body = encodeURIComponent(buildMailtoBody());
-    window.location.href = `mailto:miguelvaraujo@gmail.com?subject=${subject}&body=${body}`;
-    closePreview();
-    showToast('✅ Abrindo cliente de e-mail...');
+    window.location.href = `mailto:miguelvaraujo@gmail.com?subject=${buildSubjectArt()}&body=${body}`;
+    closeAllShareMenus();
+    showToast('✅ Abrindo Outlook...');
+  }
+
+  function shareGmail() {
+    const body = encodeURIComponent(buildMailtoBody());
+    window.open(`https://mail.google.com/mail/?view=cm&fs=1&to=miguelvaraujo@gmail.com&su=${buildSubjectArt()}&body=${body}`, '_blank');
+    closeAllShareMenus();
+    showToast('✅ Abrindo Gmail...');
+  }
+
+  function shareWhatsApp() {
+    const text = encodeURIComponent(buildMailtoBody());
+    window.open(`https://wa.me/?text=${text}`, '_blank');
+    closeAllShareMenus();
+    showToast('✅ Abrindo WhatsApp...');
+  }
+
+  function savePDF() {
+    closeAllShareMenus();
+    document.getElementById('printContent').textContent = buildEmailBody();
+    setTimeout(() => window.print(), 80);
+    showToast('✅ Preparando PDF...');
   }
 
   function showToast(msg) {
