@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Briefing de Criação · ART</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0f1117; --surface: #1a1d27; --surface2: #22263a; --border: #2e3350;
+      --text: #e8eaf6; --muted: #8892b0;
+      --accent: #a855f7; --accent-glow: rgba(168,85,247,0.3);
+      --accent-bg: rgba(168,85,247,0.08);
+    }
+    body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; min-height: 100vh; }
+
+    /* TOP BAR */
+    .topbar {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(15,17,23,.85); backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 28px; gap: 16px;
+    }
+    .back-btn {
+      display: flex; align-items: center; gap: 8px; color: var(--muted);
+      text-decoration: none; font-size: .88rem; transition: color .15s;
+    }
+    .back-btn:hover { color: var(--text); }
+    .protocol-badge {
+      display: flex; align-items: center; gap: 10px;
+      background: var(--accent-bg); border: 1px solid var(--accent);
+      border-radius: 10px; padding: 8px 16px;
+    }
+    .protocol-badge .label { font-size: .75rem; color: var(--muted); letter-spacing: .06em; text-transform: uppercase; }
+    .protocol-badge .number { font-size: 1rem; font-weight: 700; color: var(--accent); font-family: monospace; letter-spacing: .05em; }
+    .protocol-copy { background: none; border: none; color: var(--muted); cursor: pointer; display: flex; align-items: center; padding: 2px; border-radius: 4px; transition: color .15s; }
+    .protocol-copy:hover { color: var(--accent); }
+
+    /* PAGE LAYOUT */
+    .page { max-width: 720px; margin: 0 auto; padding: 40px 24px 80px; }
+
+    /* PAGE HEADER */
+    .page-header { margin-bottom: 36px; }
+    .type-tag {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--accent-bg); border: 1px solid rgba(168,85,247,.3);
+      border-radius: 999px; padding: 5px 14px;
+      font-size: .78rem; color: var(--accent); font-weight: 600; text-transform: uppercase; letter-spacing: .07em;
+      margin-bottom: 16px;
+    }
+    .page-header h1 { font-size: 2rem; font-weight: 800; letter-spacing: -.02em; }
+    .page-header p { color: var(--muted); margin-top: 8px; font-size: .95rem; line-height: 1.6; }
+
+    /* RESPONSIBLE CARD */
+    .responsible-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 14px; margin-bottom: 32px; overflow: hidden;
+    }
+    .responsible-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 20px; cursor: pointer; user-select: none;
+    }
+    .responsible-header:hover { background: var(--surface2); }
+    .responsible-left { display: flex; align-items: center; gap: 12px; }
+    .responsible-avatar {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: var(--accent-bg); border: 1px solid var(--accent);
+      display: flex; align-items: center; justify-content: center; font-size: 16px;
+    }
+    .responsible-title { font-size: .82rem; color: var(--muted); }
+    .responsible-name { font-size: .95rem; font-weight: 600; color: var(--text); }
+    .chevron { color: var(--muted); transition: transform .2s; }
+    .chevron.open { transform: rotate(180deg); }
+    .responsible-body {
+      display: none; padding: 0 20px 20px;
+      border-top: 1px solid var(--border); padding-top: 16px;
+    }
+    .responsible-body.open { display: block; }
+    .info-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; color: var(--muted); font-size: .88rem; }
+    .info-row a { color: var(--accent); text-decoration: none; }
+    .info-row a:hover { text-decoration: underline; }
+
+    /* FORM */
+    .form-section { margin-bottom: 28px; }
+    .section-title {
+      font-size: .72rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+      color: var(--accent); margin-bottom: 16px; padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .form-grid.full { grid-template-columns: 1fr; }
+    .field { display: flex; flex-direction: column; gap: 6px; }
+    .field.span2 { grid-column: 1 / -1; }
+    label { font-size: .82rem; font-weight: 600; color: var(--muted); }
+    label span { color: #ef4444; }
+    input, select, textarea {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 10px; padding: 11px 14px;
+      color: var(--text); font-size: .93rem; font-family: inherit;
+      outline: none; transition: border-color .15s, box-shadow .15s;
+      width: 100%;
+    }
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow);
+    }
+    select option { background: var(--surface2); }
+    textarea { resize: vertical; min-height: 100px; }
+    input::placeholder, textarea::placeholder { color: var(--muted); opacity: .6; }
+
+    /* ACTIONS */
+    .form-actions { display: flex; gap: 12px; margin-top: 36px; flex-wrap: wrap; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 12px 24px; border-radius: 10px; font-size: .93rem;
+      font-weight: 600; border: none; cursor: pointer; font-family: inherit;
+      transition: all .18s;
+    }
+    .btn-preview {
+      background: var(--surface); border: 1px solid var(--border); color: var(--text);
+    }
+    .btn-preview:hover { border-color: var(--accent); color: var(--accent); }
+    .btn-send {
+      background: var(--accent); color: #fff;
+      box-shadow: 0 4px 20px var(--accent-glow);
+    }
+    .btn-send:hover { filter: brightness(1.1); transform: translateY(-1px); }
+
+    /* MODAL */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,.7); backdrop-filter: blur(4px);
+      z-index: 1000; align-items: center; justify-content: center; padding: 24px;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 20px; max-width: 620px; width: 100%;
+      max-height: 80vh; overflow-y: auto; padding: 32px;
+    }
+    .modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+    .modal-header h2 { font-size: 1.1rem; font-weight: 700; }
+    .modal-close { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 20px; line-height: 1; padding: 4px; border-radius: 6px; }
+    .modal-close:hover { color: var(--text); background: var(--surface2); }
+    .email-box {
+      background: var(--bg); border: 1px solid var(--border);
+      border-radius: 12px; padding: 20px; font-size: .85rem; line-height: 1.8;
+      white-space: pre-wrap; font-family: monospace; color: var(--text); margin-bottom: 20px;
+      max-height: 340px; overflow-y: auto;
+    }
+    .modal-actions { display: flex; gap: 12px; justify-content: flex-end; flex-wrap: wrap; }
+
+    /* TOAST */
+    .toast {
+      position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(80px);
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 10px; padding: 12px 20px; font-size: .88rem;
+      transition: transform .3s ease; z-index: 9999; white-space: nowrap;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+
+    @media (max-width: 580px) {
+      .form-grid { grid-template-columns: 1fr; }
+      .field.span2 { grid-column: 1; }
+      .topbar { padding: 12px 16px; }
+      .protocol-badge .number { font-size: .85rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <a href="index.html" class="back-btn">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+    Voltar
+  </a>
+  <div class="protocol-badge">
+    <div>
+      <div class="label">Protocolo</div>
+      <div class="number" id="protocolNumber">ART-------</div>
+    </div>
+    <button class="protocol-copy" onclick="copyProtocol()" title="Copiar protocolo">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+    </button>
+  </div>
+</div>
+
+<!-- PAGE -->
+<div class="page">
+  <div class="page-header">
+    <div class="type-tag">🎨 Criação</div>
+    <h1>Briefing de Criação</h1>
+    <p>Preencha todas as informações necessárias para sua solicitação de design. Campos com <span style="color:#ef4444">*</span> são obrigatórios.</p>
+  </div>
+
+  <!-- RESPONSAVEL PELA CRIAÇÃO -->
+  <div class="responsible-card">
+    <div class="responsible-header" onclick="toggleResponsible()">
+      <div class="responsible-left">
+        <div class="responsible-avatar">👩‍🎨</div>
+        <div>
+          <div class="responsible-title">Responsável pelo briefing</div>
+          <div class="responsible-name">Leonardo Achiles</div>
+        </div>
+      </div>
+      <svg class="chevron" id="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
+    </div>
+    <div class="responsible-body" id="responsibleBody">
+      <div class="info-row">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        <a href="mailto:miguelvaraujo@gmail.com">miguelvaraujo@gmail.com</a>
+      </div>
+      <div class="info-row">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.83 19.79 19.79 0 01.1 1.18 2 2 0 012.11 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 14.92v2z"/></svg>
+        (11) 99999-0001
+      </div>
+      <div class="info-row">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/></svg>
+        Gerência de Design &amp; Criação
+      </div>
+      <div class="info-row" style="margin-top:4px; font-size:.8rem; color:var(--muted)">
+        ⏱ Tempo médio de resposta: <strong style="color:var(--text)">1–2 dias úteis</strong>
+      </div>
+    </div>
+  </div>
+
+  <!-- FORM -->
+  <form id="briefingForm" onsubmit="return false;">
+
+    <!-- Seção 1: Identificação -->
+    <div class="form-section">
+      <div class="section-title">1. Identificação do Solicitante</div>
+      <div class="form-grid">
+        <div class="field">
+          <label>Nome completo <span>*</span></label>
+          <input type="text" id="nome" placeholder="Seu nome" required />
+        </div>
+        <div class="field">
+          <label>E-mail <span>*</span></label>
+          <input type="email" id="email" placeholder="seu@email.com" required />
+        </div>
+        <div class="field">
+          <label>Departamento / Empresa <span>*</span></label>
+          <input type="text" id="departamento" placeholder="Ex: Marketing" required />
+        </div>
+        <div class="field">
+          <label>Telefone / WhatsApp</label>
+          <input type="tel" id="telefone" placeholder="(11) 99999-0000" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Seção 2: Sobre a Peça -->
+    <div class="form-section">
+      <div class="section-title">2. Sobre a Peça</div>
+      <div class="form-grid">
+        <div class="field">
+          <label>Tipo de peça <span>*</span></label>
+          <select id="tipoPeca" required>
+            <option value="">Selecione...</option>
+            <option>Banner digital</option>
+            <option>Post para redes sociais</option>
+            <option>Flyer / Panfleto</option>
+            <option>Logotipo</option>
+            <option>Identidade visual</option>
+            <option>Apresentação (slides)</option>
+            <option>Material impresso</option>
+            <option>Vídeo / Motion</option>
+            <option>E-mail marketing</option>
+            <option>Outro</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Formato / Dimensões</label>
+          <select id="formato">
+            <option value="">Selecione...</option>
+            <optgroup label="Digital">
+              <option>Post quadrado (1080×1080px)</option>
+              <option>Post retrato (1080×1350px)</option>
+              <option>Story / Reels (1080×1920px)</option>
+              <option>Banner web (728×90px)</option>
+              <option>Banner leaderboard (970×250px)</option>
+              <option>Capa Facebook (820×312px)</option>
+              <option>Capa LinkedIn (1584×396px)</option>
+              <option>E-mail marketing (600px largura)</option>
+            </optgroup>
+            <optgroup label="Impresso">
+              <option>A4 (210×297mm)</option>
+              <option>A5 (148×210mm)</option>
+              <option>A3 (297×420mm)</option>
+              <option>Flyer A6 (105×148mm)</option>
+              <option>Cartão de visita (90×50mm)</option>
+              <option>Banner 60×160cm</option>
+              <option>Banner 80×200cm</option>
+              <option>Outdoor (9×3m)</option>
+            </optgroup>
+            <optgroup label="Vídeo / Motion">
+              <option>Feed quadrado (1:1)</option>
+              <option>Feed paisagem (16:9)</option>
+              <option>Story vertical (9:16)</option>
+              <option>Apresentação (16:9 – slides)</option>
+            </optgroup>
+            <optgroup label="Outro">
+              <option>Tamanho personalizado</option>
+            </optgroup>
+          </select>
+        </div>
+        <div class="field span2">
+          <label>Nome do projeto / campanha <span>*</span></label>
+          <input type="text" id="projeto" placeholder="Ex: Campanha Black Friday 2026" required />
+        </div>
+        <div class="field span2">
+          <label>Objetivo da peça <span>*</span></label>
+          <textarea id="objetivo" placeholder="O que essa peça precisa comunicar? Qual ação você quer que o público tome?" required></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- Seção 3: Público e Contexto -->
+    <div class="form-section">
+      <div class="section-title">3. Público &amp; Contexto</div>
+      <div class="form-grid">
+        <div class="field">
+          <label>Público-alvo <span>*</span></label>
+          <input type="text" id="publico" placeholder="Ex: Jovens 18–30, empresas B2B..." required />
+        </div>
+        <div class="field">
+          <label>Onde será veiculada?</label>
+          <input type="text" id="veiculo" placeholder="Ex: Instagram, email, outdoor..." />
+        </div>
+        <div class="field span2">
+          <label>Tom de voz / Estilo visual</label>
+          <input type="text" id="tom" placeholder="Ex: Moderno, minimalista, colorido, sério, divertido..." />
+        </div>
+        <div class="field span2">
+          <label>Referências visuais</label>
+          <textarea id="referencias" placeholder="Links, descreva marcas ou estilos de referência que gosta..." style="min-height:80px"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- Seção 4: Prazo e Entrega -->
+    <div class="form-section">
+      <div class="section-title">4. Prazo &amp; Entrega</div>
+      <div class="form-grid">
+        <div class="field">
+          <label>Data limite de entrega <span>*</span></label>
+          <input type="date" id="prazo" required />
+        </div>
+        <div class="field">
+          <label>Prioridade</label>
+          <select id="prioridade">
+            <option value="">Selecione...</option>
+            <option>Normal</option>
+            <option>Alta</option>
+            <option>Urgente</option>
+          </select>
+        </div>
+        <div class="field span2">
+          <label>Formato de entrega esperado</label>
+          <input type="text" id="entrega" placeholder="Ex: PNG, PDF editável, AI, MP4..." />
+        </div>
+      </div>
+    </div>
+
+    <!-- Seção 5: Informações Adicionais -->
+    <div class="form-section">
+      <div class="section-title">5. Informações Adicionais</div>
+      <div class="form-grid full">
+        <div class="field">
+          <label>Textos / Conteúdo da peça</label>
+          <textarea id="textos" placeholder="Cole aqui os textos que deverão constar na peça..." style="min-height:90px"></textarea>
+        </div>
+        <div class="field">
+          <label>Observações gerais</label>
+          <textarea id="obs" placeholder="Informações extras, restrições, coisas a evitar..." style="min-height:80px"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACTIONS -->
+    <div class="form-actions">
+      <button type="button" class="btn btn-preview" onclick="openPreview()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        Visualizar e-mail
+      </button>
+      <button type="button" class="btn btn-send" onclick="sendEmail()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        Enviar briefing
+      </button>
+    </div>
+  </form>
+</div>
+
+<!-- MODAL PREVIEW -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>📧 Pré-visualização do e-mail</h2>
+      <button class="modal-close" onclick="closePreview()">✕</button>
+    </div>
+    <div class="email-box" id="emailPreview"></div>
+    <div class="modal-actions">
+      <button class="btn btn-preview" onclick="closePreview()">Fechar</button>
+      <button class="btn btn-send" onclick="sendEmail()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        Enviar agora
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+  // Generate protocol
+  const protocol = 'ART-' + String(Math.floor(100000 + Math.random() * 900000));
+  document.getElementById('protocolNumber').textContent = protocol;
+
+  function toggleResponsible() {
+    const body = document.getElementById('responsibleBody');
+    const chevron = document.getElementById('chevron');
+    body.classList.toggle('open');
+    chevron.classList.toggle('open');
+  }
+
+  function copyProtocol() {
+    navigator.clipboard.writeText(protocol).then(() => showToast('✅ Protocolo copiado!'));
+  }
+
+  function val(id) {
+    const el = document.getElementById(id);
+    return el ? el.value.trim() : '';
+  }
+
+  function buildEmailBody() {
+    const now = new Date().toLocaleString('pt-BR');
+    return `BRIEFING DE CRIAÇÃO
+Protocolo: ${protocol}
+Data de envio: ${now}
+${'─'.repeat(50)}
+
+IDENTIFICAÇÃO DO SOLICITANTE
+Nome: ${val('nome') || '—'}
+E-mail: ${val('email') || '—'}
+Departamento: ${val('departamento') || '—'}
+Telefone: ${val('telefone') || '—'}
+
+${'─'.repeat(50)}
+SOBRE A PEÇA
+Tipo de peça: ${val('tipoPeca') || '—'}
+Formato/Dimensões: ${val('formato') || '—'}
+Projeto/Campanha: ${val('projeto') || '—'}
+Objetivo:
+${val('objetivo') || '—'}
+
+${'─'.repeat(50)}
+PÚBLICO & CONTEXTO
+Público-alvo: ${val('publico') || '—'}
+Veiculação: ${val('veiculo') || '—'}
+Tom de voz: ${val('tom') || '—'}
+Referências:
+${val('referencias') || '—'}
+
+${'─'.repeat(50)}
+PRAZO & ENTREGA
+Data limite: ${val('prazo') || '—'}
+Prioridade: ${val('prioridade') || '—'}
+Formato de entrega: ${val('entrega') || '—'}
+
+${'─'.repeat(50)}
+INFORMAÇÕES ADICIONAIS
+Textos da peça:
+${val('textos') || '—'}
+
+Observações:
+${val('obs') || '—'}
+
+${'─'.repeat(50)}
+Este briefing foi gerado automaticamente pela Central de Briefings.
+Acompanhe sua solicitação com o protocolo: ${protocol}`;
+  }
+
+  // Versão compacta para o mailto (evita estouro de limite de URL)
+  function buildMailtoBody() {
+    const now = new Date().toLocaleString('pt-BR');
+    return [
+      `BRIEFING DE CRIAÇÃO | Protocolo: ${protocol}`,
+      `Data: ${now}`,
+      ``,
+      `Solicitante: ${val('nome')} | ${val('email')} | ${val('departamento')}`,
+      val('telefone') ? `Telefone: ${val('telefone')}` : null,
+      ``,
+      `Tipo de peça: ${val('tipoPeca')}`,
+      val('formato') ? `Formato: ${val('formato')}` : null,
+      `Projeto/Campanha: ${val('projeto')}`,
+      val('prazo') ? `Prazo: ${val('prazo')}` : null,
+      val('prioridade') ? `Prioridade: ${val('prioridade')}` : null,
+      ``,
+      `Objetivo: ${val('objetivo')}`,
+      ``,
+      `Público-alvo: ${val('publico')}`,
+      val('veiculo') ? `Veiculação: ${val('veiculo')}` : null,
+      val('tom') ? `Tom/Estilo: ${val('tom')}` : null,
+      val('entrega') ? `Formato de entrega: ${val('entrega')}` : null,
+      val('textos') ? `\nTextos da peça:\n${val('textos')}` : null,
+      val('obs') ? `\nObservações:\n${val('obs')}` : null,
+    ].filter(l => l !== null).join('\n');
+  }
+
+  function setFieldError(id, hasError) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.style.borderColor = hasError ? '#ef4444' : '';
+    el.style.boxShadow  = hasError ? '0 0 0 3px rgba(239,68,68,0.2)' : '';
+  }
+
+  function validateEmail(v) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); }
+  function validatePhone(v) { return v === '' || /^\(?\d{2}\)?\s?\d{4,5}[-\s]?\d{4}$/.test(v.replace(/\s/g,'')); }
+
+  function validateRequired() {
+    const required = ['nome','email','departamento','tipoPeca','projeto','objetivo','publico','prazo'];
+    let firstError = null;
+    let ok = true;
+
+    for (const id of required) {
+      const empty = !val(id);
+      setFieldError(id, empty);
+      if (empty && !firstError) firstError = id;
+      if (empty) ok = false;
+    }
+
+    // E-mail format
+    const emailOk = validateEmail(val('email'));
+    if (val('email') && !emailOk) { setFieldError('email', true); if (!firstError) firstError = 'email'; ok = false; }
+
+    // Phone format
+    const phoneOk = validatePhone(val('telefone'));
+    if (!phoneOk) { setFieldError('telefone', true); if (!firstError) firstError = 'telefone'; ok = false; }
+
+    if (!ok) {
+      if (firstError) document.getElementById(firstError).focus();
+      showToast('⚠️ Corrija os campos destacados em vermelho.');
+    }
+    return ok;
+  }
+
+  // Clear error style on input
+  ['nome','email','departamento','tipoPeca','projeto','objetivo','publico','prazo','telefone'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('input', () => setFieldError(id, false));
+  });
+
+  function openPreview() {
+    document.getElementById('emailPreview').textContent = buildEmailBody();
+    document.getElementById('modalOverlay').classList.add('open');
+  }
+
+  function closePreview() {
+    document.getElementById('modalOverlay').classList.remove('open');
+  }
+
+  function sendEmail() {
+    if (!validateRequired()) return;
+    const subject = encodeURIComponent(`[Criação] ${protocol} – ${val('projeto') || 'Nova solicitação'}`);
+    const body = encodeURIComponent(buildMailtoBody());
+    window.location.href = `mailto:miguelvaraujo@gmail.com?subject=${subject}&body=${body}`;
+    closePreview();
+    showToast('✅ Abrindo cliente de e-mail...');
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3000);
+  }
+
+  // Close modal clicking overlay
+  document.getElementById('modalOverlay').addEventListener('click', function(e) {
+    if (e.target === this) closePreview();
+  });
+</script>
+</body>
+</html>

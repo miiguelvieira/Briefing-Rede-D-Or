@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Central de Briefings</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0f1117;
+      --surface: #1a1d27;
+      --surface2: #22263a;
+      --border: #2e3350;
+      --text: #e8eaf6;
+      --muted: #8892b0;
+      --criacao: #a855f7;
+      --criacao-glow: rgba(168,85,247,0.25);
+      --eventos: #10b981;
+      --eventos-glow: rgba(16,185,129,0.25);
+      --patrocinio: #f59e0b;
+      --patrocinio-glow: rgba(245,158,11,0.25);
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── HEADER ── */
+    header {
+      text-align: center;
+      padding: 64px 24px 40px;
+    }
+    .badge {
+      display: inline-block;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 6px 16px;
+      font-size: 12px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 24px;
+    }
+    header h1 {
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      font-weight: 800;
+      letter-spacing: -.02em;
+      line-height: 1.1;
+      background: linear-gradient(135deg, #e8eaf6 30%, #8892b0);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    header p {
+      margin-top: 16px;
+      color: var(--muted);
+      font-size: 1.05rem;
+      max-width: 520px;
+      margin-inline: auto;
+      line-height: 1.6;
+    }
+
+    /* ── CARDS ── */
+    main {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 0 24px 80px;
+    }
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
+      width: 100%;
+      max-width: 960px;
+    }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 36px 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      text-decoration: none;
+      color: inherit;
+      transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 20px;
+      opacity: 0;
+      transition: opacity .22s ease;
+    }
+    .card:hover { transform: translateY(-6px); }
+
+    .card.criacao:hover  { border-color: var(--criacao);  box-shadow: 0 20px 60px var(--criacao-glow); }
+    .card.eventos:hover  { border-color: var(--eventos);  box-shadow: 0 20px 60px var(--eventos-glow); }
+    .card.patrocinio:hover { border-color: var(--patrocinio); box-shadow: 0 20px 60px var(--patrocinio-glow); }
+
+    .card-icon {
+      width: 52px; height: 52px;
+      border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 24px;
+    }
+    .criacao  .card-icon { background: rgba(168,85,247,.15); }
+    .eventos  .card-icon { background: rgba(16,185,129,.15); }
+    .patrocinio .card-icon { background: rgba(245,158,11,.15); }
+
+    .card h2 {
+      font-size: 1.3rem;
+      font-weight: 700;
+    }
+    .criacao  h2 { color: var(--criacao); }
+    .eventos  h2 { color: var(--eventos); }
+    .patrocinio h2 { color: var(--patrocinio); }
+
+    .card p {
+      color: var(--muted);
+      font-size: .93rem;
+      line-height: 1.6;
+      flex: 1;
+    }
+
+    .card-tag {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      width: fit-content;
+    }
+    .criacao  .card-tag { background: rgba(168,85,247,.12); color: var(--criacao); }
+    .eventos  .card-tag { background: rgba(16,185,129,.12); color: var(--eventos); }
+    .patrocinio .card-tag { background: rgba(245,158,11,.12); color: var(--patrocinio); }
+
+    .card-cta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: .9rem;
+      font-weight: 600;
+      margin-top: 8px;
+    }
+    .criacao  .card-cta { color: var(--criacao); }
+    .eventos  .card-cta { color: var(--eventos); }
+    .patrocinio .card-cta { color: var(--patrocinio); }
+    .card-cta svg { transition: transform .18s ease; }
+    .card:hover .card-cta svg { transform: translateX(4px); }
+
+    /* ── FOOTER ── */
+    footer {
+      text-align: center;
+      padding: 24px;
+      color: var(--muted);
+      font-size: .8rem;
+      border-top: 1px solid var(--border);
+    }
+
+    @media (max-width: 600px) {
+      .cards { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="badge">Central de Briefings</div>
+    <h1>Qual tipo de briefing<br>você precisa?</h1>
+    <p>Selecione a categoria abaixo para preencher o formulário. Você receberá um número de protocolo para acompanhar sua solicitação.</p>
+  </header>
+
+  <main>
+    <div class="cards">
+
+      <a href="criacao.html" class="card criacao">
+        <div class="card-icon">🎨</div>
+        <span class="card-tag">Protocolo ART</span>
+        <h2>Criação</h2>
+        <p>Solicitações de design, identidade visual, peças gráficas, materiais digitais e impressos.</p>
+        <div class="card-cta">
+          Iniciar briefing
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
+        </div>
+      </a>
+
+      <a href="eventos.html" class="card eventos">
+        <div class="card-icon">🎪</div>
+        <span class="card-tag">Protocolo EVT</span>
+        <h2>Eventos</h2>
+        <p>Planejamento e organização de eventos, workshops, conferências e ativações de marca.</p>
+        <div class="card-cta">
+          Iniciar briefing
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
+        </div>
+      </a>
+
+      <a href="patrocinio.html" class="card patrocinio">
+        <div class="card-icon">🤝</div>
+        <span class="card-tag">Protocolo PAT</span>
+        <h2>Patrocínio</h2>
+        <p>Propostas de patrocínio, parcerias estratégicas, contrapartidas e investimentos em projetos.</p>
+        <div class="card-cta">
+          Iniciar briefing
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
+        </div>
+      </a>
+
+    </div>
+  </main>
+
+  <footer>
+    &copy; 2026 Central de Briefings &mdash; Todos os protocolos são registrados e acompanhados pela equipe responsável.
+  </footer>
+</body>
+</html>

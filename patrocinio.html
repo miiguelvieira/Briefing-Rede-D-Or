@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Briefing de Patrocínio · PAT</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0f1117; --surface: #1a1d27; --surface2: #22263a; --border: #2e3350;
+      --text: #e8eaf6; --muted: #8892b0;
+      --accent: #f59e0b; --accent-glow: rgba(245,158,11,0.3);
+      --accent-bg: rgba(245,158,11,0.08);
+    }
+    body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; min-height: 100vh; }
+
+    .topbar {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(15,17,23,.85); backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 28px; gap: 16px;
+    }
+    .back-btn {
+      display: flex; align-items: center; gap: 8px; color: var(--muted);
+      text-decoration: none; font-size: .88rem; transition: color .15s;
+    }
+    .back-btn:hover { color: var(--text); }
+    .protocol-badge {
+      display: flex; align-items: center; gap: 10px;
+      background: var(--accent-bg); border: 1px solid var(--accent);
+      border-radius: 10px; padding: 8px 16px;
+    }
+    .protocol-badge .label { font-size: .75rem; color: var(--muted); letter-spacing: .06em; text-transform: uppercase; }
+    .protocol-badge .number { font-size: 1rem; font-weight: 700; color: var(--accent); font-family: monospace; letter-spacing: .05em; }
+    .protocol-copy { background: none; border: none; color: var(--muted); cursor: pointer; display: flex; align-items: center; padding: 2px; border-radius: 4px; transition: color .15s; }
+    .protocol-copy:hover { color: var(--accent); }
+
+    .page { max-width: 720px; margin: 0 auto; padding: 40px 24px 80px; }
+
+    .page-header { margin-bottom: 36px; }
+    .type-tag {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--accent-bg); border: 1px solid rgba(245,158,11,.3);
+      border-radius: 999px; padding: 5px 14px;
+      font-size: .78rem; color: var(--accent); font-weight: 600; text-transform: uppercase; letter-spacing: .07em;
+      margin-bottom: 16px;
+    }
+    .page-header h1 { font-size: 2rem; font-weight: 800; letter-spacing: -.02em; }
+    .page-header p { color: var(--muted); margin-top: 8px; font-size: .95rem; line-height: 1.6; }
+
+    .responsible-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 14px; margin-bottom: 32px; overflow: hidden;
+    }
+    .responsible-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 20px; cursor: pointer; user-select: none;
+    }
+    .responsible-header:hover { background: var(--surface2); }
+    .responsible-left { display: flex; align-items: center; gap: 12px; }
+    .responsible-avatar {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: var(--accent-bg); border: 1px solid var(--accent);
+      display: flex; align-items: center; justify-content: center; font-size: 16px;
+    }
+    .responsible-title { font-size: .82rem; color: var(--muted); }
+    .responsible-name { font-size: .95rem; font-weight: 600; color: var(--text); }
+    .chevron { color: var(--muted); transition: transform .2s; }
+    .chevron.open { transform: rotate(180deg); }
+    .responsible-body { display: none; padding: 16px 20px 20px; border-top: 1px solid var(--border); }
+    .responsible-body.open { display: block; }
+    .info-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; color: var(--muted); font-size: .88rem; }
+    .info-row a { color: var(--accent); text-decoration: none; }
+    .info-row a:hover { text-decoration: underline; }
+
+    .form-section { margin-bottom: 28px; }
+    .section-title {
+      font-size: .72rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+      color: var(--accent); margin-bottom: 16px; padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .form-grid.full { grid-template-columns: 1fr; }
+    .field { display: flex; flex-direction: column; gap: 6px; }
+    .field.span2 { grid-column: 1 / -1; }
+    label { font-size: .82rem; font-weight: 600; color: var(--muted); }
+    label span { color: #ef4444; }
+    input, select, textarea {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 10px; padding: 11px 14px;
+      color: var(--text); font-size: .93rem; font-family: inherit;
+      outline: none; transition: border-color .15s, box-shadow .15s; width: 100%;
+    }
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow);
+    }
+    select option { background: var(--surface2); }
+    textarea { resize: vertical; min-height: 100px; }
+    input::placeholder, textarea::placeholder { color: var(--muted); opacity: .6; }
+
+    .form-actions { display: flex; gap: 12px; margin-top: 36px; flex-wrap: wrap; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 12px 24px; border-radius: 10px; font-size: .93rem;
+      font-weight: 600; border: none; cursor: pointer; font-family: inherit;
+      transition: all .18s;
+    }
+    .btn-preview { background: var(--surface); border: 1px solid var(--border); color: var(--text); }
+    .btn-preview:hover { border-color: var(--accent); color: var(--accent); }
+    .btn-send { background: var(--accent); color: #111; box-shadow: 0 4px 20px var(--accent-glow); }
+    .btn-send:hover { filter: brightness(1.1); transform: translateY(-1px); }
+
+    .modal-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,.7); backdrop-filter: blur(4px);
+      z-index: 1000; align-items: center; justify-content: center; padding: 24px;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 20px; max-width: 620px; width: 100%;
+      max-height: 80vh; overflow-y: auto; padding: 32px;
+    }
+    .modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+    .modal-header h2 { font-size: 1.1rem; font-weight: 700; }
+    .modal-close { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 20px; line-height: 1; padding: 4px; border-radius: 6px; }
+    .modal-close:hover { color: var(--text); background: var(--surface2); }
+    .email-box {
+      background: var(--bg); border: 1px solid var(--border);
+      border-radius: 12px; padding: 20px; font-size: .85rem; line-height: 1.8;
+      white-space: pre-wrap; font-family: monospace; color: var(--text); margin-bottom: 20px;
+      max-height: 340px; overflow-y: auto;
+    }
+    .modal-actions { display: flex; gap: 12px; justify-content: flex-end; flex-wrap: wrap; }
+
+    .toast {
+      position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(80px);
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 10px; padding: 12px 20px; font-size: .88rem;
+      transition: transform .3s ease; z-index: 9999; white-space: nowrap;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+
+    @media (max-width: 580px) {
+      .form-grid { grid-template-columns: 1fr; }
+      .field.span2 { grid-column: 1; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="topbar">
+  <a href="index.html" class="back-btn">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+    Voltar
+  </a>
+  <div class="protocol-badge">
+    <div>
+      <div class="label">Protocolo</div>
+      <div class="number" id="protocolNumber">PAT-------</div>
+    </div>
+    <button class="protocol-copy" onclick="copyProtocol()" title="Copiar protocolo">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+    </button>
+  </div>
+</div>
+
+<div class="page">
+  <div class="page-header">
+    <div class="type-tag">🤝 Patrocínio</div>
+    <h1>Briefing de Patrocínio</h1>
+    <p>Apresente os detalhes da sua proposta de patrocínio ou parceria estratégica. Campos com <span style="color:#ef4444">*</span> são obrigatórios.</p>
+  </div>
+
+  <!-- RESPONSIBLE -->
+  <div class="responsible-card">
+    <div class="responsible-header" onclick="toggleResponsible()">
+      <div class="responsible-left">
+        <div class="responsible-avatar">💼</div>
+        <div>
+          <div class="responsible-title">Responsável pelo briefing</div>
+          <div class="responsible-name">Beatriz Lima</div>
+        </div>
+      </div>
+      <svg class="chevron" id="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
+    </div>
+    <div class="responsible-body" id="responsibleBody">
+      <div class="info-row">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        <a href="mailto:beatriz.lima@empresa.com">beatriz.lima@empresa.com</a>
+      </div>
+      <div class="info-row">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.83 19.79 19.79 0 01.1 1.18 2 2 0 012.11 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 14.92v2z"/></svg>
+        (11) 99999-0003
+      </div>
+      <div class="info-row">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/></svg>
+        Gerência de Parcerias &amp; Patrocínios
+      </div>
+      <div class="info-row" style="margin-top:4px; font-size:.8rem; color:var(--muted)">
+        ⏱ Tempo médio de resposta: <strong style="color:var(--text)">3–5 dias úteis</strong>
+      </div>
+    </div>
+  </div>
+
+  <form id="briefingForm" onsubmit="return false;">
+
+    <!-- Seção 1 -->
+    <div class="form-section">
+      <div class="section-title">1. Identificação do Solicitante</div>
+      <div class="form-grid">
+        <div class="field">
+          <label>Nome completo <span>*</span></label>
+          <input type="text" id="nome" placeholder="Seu nome" required />
+        </div>
+        <div class="field">
+          <label>Cargo / Função <span>*</span></label>
+          <input type="text" id="cargo" placeholder="Ex: Diretor de Marketing" required />
+        </div>
+        <div class="field">
+          <label>E-mail <span>*</span></label>
+          <input type="email" id="email" placeholder="seu@email.com" required />
+        </div>
+        <div class="field">
+          <label>Telefone / WhatsApp</label>
+          <input type="tel" id="telefone" placeholder="(11) 99999-0000" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Seção 2 -->
+    <div class="form-section">
+      <div class="section-title">2. Sobre o Projeto / Empresa</div>
+      <div class="form-grid">
+        <div class="field span2">
+          <label>Nome da empresa / projeto <span>*</span></label>
+          <input type="text" id="empresa" placeholder="Razão social ou nome do projeto" required />
+        </div>
+        <div class="field">
+          <label>Segmento / Setor <span>*</span></label>
+          <input type="text" id="segmento" placeholder="Ex: Tecnologia, Educação, Esportes..." required />
+        </div>
+        <div class="field">
+          <label>Website / Portfólio</label>
+          <input type="url" id="website" placeholder="https://..." />
+        </div>
+        <div class="field span2">
+          <label>Descrição do projeto <span>*</span></label>
+          <textarea id="descricao" placeholder="Apresente o projeto de forma resumida: o que é, qual problema resolve, qual a relevância..." required></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- Seção 3 -->
+    <div class="form-section">
+      <div class="section-title">3. Proposta de Patrocínio</div>
+      <div class="form-grid">
+        <div class="field">
+          <label>Tipo de patrocínio <span>*</span></label>
+          <select id="tipoPatrocinio" required>
+            <option value="">Selecione...</option>
+            <option>Patrocínio master</option>
+            <option>Patrocínio de evento</option>
+            <option>Patrocínio de conteúdo</option>
+            <option>Naming rights</option>
+            <option>Co-branding</option>
+            <option>Patrocínio de atleta/influencer</option>
+            <option>Patrocínio de causa social</option>
+            <option>Outro</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Valor solicitado (R$) <span>*</span></label>
+          <input type="text" id="valor" placeholder="Ex: R$ 50.000,00" required />
+        </div>
+        <div class="field">
+          <label>Duração do patrocínio</label>
+          <input type="text" id="duracao" placeholder="Ex: 6 meses, 1 ano, evento único..." />
+        </div>
+        <div class="field">
+          <label>Prazo para resposta <span>*</span></label>
+          <input type="date" id="prazo" required />
+        </div>
+        <div class="field span2">
+          <label>Contrapartidas oferecidas <span>*</span></label>
+          <textarea id="contrapartidas" placeholder="Descreva o que o patrocinador receberá: logo em materiais, menções, ingressos, espaço de ativação, posts, etc." required></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- Seção 4 -->
+    <div class="form-section">
+      <div class="section-title">4. Público &amp; Alcance</div>
+      <div class="form-grid">
+        <div class="field">
+          <label>Público-alvo <span>*</span></label>
+          <input type="text" id="publico" placeholder="Ex: Jovens 18–35, perfil ABC, empreendedores..." required />
+        </div>
+        <div class="field">
+          <label>Alcance estimado</label>
+          <input type="text" id="alcance" placeholder="Ex: 50.000 pessoas, 200k seguidores..." />
+        </div>
+        <div class="field span2">
+          <label>Canais de comunicação do projeto</label>
+          <input type="text" id="canais" placeholder="Ex: Instagram 50k, evento presencial, podcast, newsletter..." />
+        </div>
+        <div class="field span2">
+          <label>Alinhamento com a marca patrocinadora</label>
+          <textarea id="alinhamento" placeholder="Por que esse patrocínio faz sentido para o patrocinador? Quais valores compartilham?" style="min-height:80px"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- Seção 5 -->
+    <div class="form-section">
+      <div class="section-title">5. Materiais &amp; Informações Adicionais</div>
+      <div class="form-grid full">
+        <div class="field">
+          <label>Patrocinadores anteriores / atuais</label>
+          <input type="text" id="anteriores" placeholder="Ex: Empresa X, Marca Y (ano)..." />
+        </div>
+        <div class="field">
+          <label>Materiais de apoio disponíveis</label>
+          <input type="text" id="materiais" placeholder="Ex: Mídia kit disponível, apresentação em PDF, cases..." />
+        </div>
+        <div class="field">
+          <label>Resultados / Métricas anteriores</label>
+          <textarea id="resultados" placeholder="Se já houve edições anteriores, compartilhe números: público, cobertura, ROI de patrocinadores..." style="min-height:80px"></textarea>
+        </div>
+        <div class="field">
+          <label>Observações gerais</label>
+          <textarea id="obs" placeholder="Informações complementares, condições especiais, pontos de atenção..." style="min-height:70px"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="button" class="btn btn-preview" onclick="openPreview()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        Visualizar e-mail
+      </button>
+      <button type="button" class="btn btn-send" onclick="sendEmail()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        Enviar briefing
+      </button>
+    </div>
+  </form>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>📧 Pré-visualização do e-mail</h2>
+      <button class="modal-close" onclick="closePreview()">✕</button>
+    </div>
+    <div class="email-box" id="emailPreview"></div>
+    <div class="modal-actions">
+      <button class="btn btn-preview" onclick="closePreview()">Fechar</button>
+      <button class="btn btn-send" onclick="sendEmail()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        Enviar agora
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  const protocol = 'PAT-' + String(Math.floor(100000 + Math.random() * 900000));
+  document.getElementById('protocolNumber').textContent = protocol;
+
+  function toggleResponsible() {
+    document.getElementById('responsibleBody').classList.toggle('open');
+    document.getElementById('chevron').classList.toggle('open');
+  }
+
+  function copyProtocol() {
+    navigator.clipboard.writeText(protocol).then(() => showToast('✅ Protocolo copiado!'));
+  }
+
+  function val(id) {
+    const el = document.getElementById(id);
+    return el ? el.value.trim() : '';
+  }
+
+  function buildEmailBody() {
+    const now = new Date().toLocaleString('pt-BR');
+    return `BRIEFING DE PATROCÍNIO
+Protocolo: ${protocol}
+Data de envio: ${now}
+${'─'.repeat(50)}
+
+IDENTIFICAÇÃO DO SOLICITANTE
+Nome: ${val('nome') || '—'}
+Cargo: ${val('cargo') || '—'}
+E-mail: ${val('email') || '—'}
+Telefone: ${val('telefone') || '—'}
+
+${'─'.repeat(50)}
+SOBRE O PROJETO / EMPRESA
+Empresa/Projeto: ${val('empresa') || '—'}
+Segmento: ${val('segmento') || '—'}
+Website: ${val('website') || '—'}
+Descrição:
+${val('descricao') || '—'}
+
+${'─'.repeat(50)}
+PROPOSTA DE PATROCÍNIO
+Tipo: ${val('tipoPatrocinio') || '—'}
+Valor solicitado: ${val('valor') || '—'}
+Duração: ${val('duracao') || '—'}
+Prazo para resposta: ${val('prazo') || '—'}
+Contrapartidas oferecidas:
+${val('contrapartidas') || '—'}
+
+${'─'.repeat(50)}
+PÚBLICO & ALCANCE
+Público-alvo: ${val('publico') || '—'}
+Alcance estimado: ${val('alcance') || '—'}
+Canais de comunicação: ${val('canais') || '—'}
+Alinhamento com a marca:
+${val('alinhamento') || '—'}
+
+${'─'.repeat(50)}
+MATERIAIS & INFORMAÇÕES ADICIONAIS
+Patrocinadores anteriores: ${val('anteriores') || '—'}
+Materiais de apoio: ${val('materiais') || '—'}
+Resultados anteriores:
+${val('resultados') || '—'}
+
+Observações:
+${val('obs') || '—'}
+
+${'─'.repeat(50)}
+Este briefing foi gerado automaticamente pela Central de Briefings.
+Acompanhe sua solicitação com o protocolo: ${protocol}`;
+  }
+
+  function buildMailtoBody() {
+    const now = new Date().toLocaleString('pt-BR');
+    return [
+      `BRIEFING DE PATROCÍNIO | Protocolo: ${protocol}`,
+      `Data: ${now}`,
+      ``,
+      `Solicitante: ${val('nome')} | ${val('cargo')} | ${val('email')}`,
+      val('telefone') ? `Telefone: ${val('telefone')}` : null,
+      ``,
+      `Empresa/Projeto: ${val('empresa')} | Segmento: ${val('segmento')}`,
+      val('website') ? `Website: ${val('website')}` : null,
+      ``,
+      `Tipo: ${val('tipoPatrocinio')} | Valor: ${val('valor')}`,
+      val('duracao') ? `Duração: ${val('duracao')}` : null,
+      `Prazo de resposta: ${val('prazo')}`,
+      ``,
+      `Público-alvo: ${val('publico')}`,
+      val('alcance') ? `Alcance: ${val('alcance')}` : null,
+      val('canais') ? `Canais: ${val('canais')}` : null,
+      ``,
+      `Descricao do projeto:\n${val('descricao')}`,
+      ``,
+      `Contrapartidas:\n${val('contrapartidas')}`,
+      val('obs') ? `\nObservações:\n${val('obs')}` : null,
+    ].filter(l => l !== null).join('\n');
+  }
+
+  function setFieldError(id, hasError) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.style.borderColor = hasError ? '#ef4444' : '';
+    el.style.boxShadow  = hasError ? '0 0 0 3px rgba(239,68,68,0.2)' : '';
+  }
+
+  function validateEmail(v) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); }
+  function validatePhone(v) { return v === '' || /^\(?\d{2}\)?\s?\d{4,5}[-\s]?\d{4}$/.test(v.replace(/\s/g,'')); }
+  function validateValor(v) { return v === '' || /^R?\$?\s?\d[\d.,\s]*$/.test(v); }
+
+  function validateRequired() {
+    const required = ['nome','cargo','email','empresa','segmento','descricao','tipoPatrocinio','valor','prazo','contrapartidas','publico'];
+    let firstError = null;
+    let ok = true;
+
+    for (const id of required) {
+      const empty = !val(id);
+      setFieldError(id, empty);
+      if (empty && !firstError) firstError = id;
+      if (empty) ok = false;
+    }
+
+    const emailOk = validateEmail(val('email'));
+    if (val('email') && !emailOk) { setFieldError('email', true); if (!firstError) firstError = 'email'; ok = false; }
+
+    const phoneOk = validatePhone(val('telefone'));
+    if (!phoneOk) { setFieldError('telefone', true); if (!firstError) firstError = 'telefone'; ok = false; }
+
+    const valorOk = validateValor(val('valor'));
+    if (val('valor') && !valorOk) { setFieldError('valor', true); if (!firstError) firstError = 'valor'; ok = false; }
+
+    if (!ok) {
+      if (firstError) document.getElementById(firstError).focus();
+      showToast('⚠️ Corrija os campos destacados em vermelho.');
+    }
+    return ok;
+  }
+
+  ['nome','cargo','email','empresa','segmento','descricao','tipoPatrocinio','valor','prazo','contrapartidas','publico','telefone'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('input', () => setFieldError(id, false));
+  });
+
+  function openPreview() {
+    document.getElementById('emailPreview').textContent = buildEmailBody();
+    document.getElementById('modalOverlay').classList.add('open');
+  }
+
+  function closePreview() {
+    document.getElementById('modalOverlay').classList.remove('open');
+  }
+
+  function sendEmail() {
+    if (!validateRequired()) return;
+    const subject = encodeURIComponent(`[Patrocínio] ${protocol} – ${val('empresa') || 'Nova proposta'}`);
+    const body = encodeURIComponent(buildMailtoBody());
+    window.location.href = `mailto:beatriz.lima@empresa.com?subject=${subject}&body=${body}`;
+    closePreview();
+    showToast('✅ Abrindo cliente de e-mail...');
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3000);
+  }
+
+  document.getElementById('modalOverlay').addEventListener('click', function(e) {
+    if (e.target === this) closePreview();
+  });
+</script>
+</body>
+</html>
