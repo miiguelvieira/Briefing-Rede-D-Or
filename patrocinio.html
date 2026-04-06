@@ -205,7 +205,7 @@
         <div class="responsible-avatar">💼</div>
         <div>
           <div class="responsible-title">Responsável pelo briefing</div>
-          <div class="responsible-name">Beatriz Lima</div>
+          <div class="responsible-name">Thereza Gerhard</div>
         </div>
       </div>
       <svg class="chevron" id="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
@@ -213,15 +213,15 @@
     <div class="responsible-body" id="responsibleBody">
       <div class="info-row">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-        <a href="mailto:beatriz.lima@empresa.com">beatriz.lima@empresa.com</a>
+        <a href="mailto:thereza.gerhard@rededor.com.br">thereza.gerhard@rededor.com.br</a>
       </div>
       <div class="info-row">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.83 19.79 19.79 0 01.1 1.18 2 2 0 012.11 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 14.92v2z"/></svg>
-        (11) 99999-0003
+        (21) 97949-3943
       </div>
       <div class="info-row">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/></svg>
-        Gerência de Parcerias &amp; Patrocínios
+        Parcerias &amp; Patrocínios
       </div>
       <div class="info-row" style="margin-top:4px; font-size:.8rem; color:var(--muted)">
         ⏱ Tempo médio de resposta: <strong style="color:var(--text)">3–5 dias úteis</strong>
@@ -248,8 +248,8 @@
           <input type="email" id="email" placeholder="seu@email.com" required />
         </div>
         <div class="field">
-          <label>Telefone / WhatsApp</label>
-          <input type="tel" id="telefone" placeholder="(11) 99999-0000" />
+          <label>Telefone / WhatsApp <span>*</span></label>
+          <input type="tel" id="telefone" placeholder="(21) 99999-0000" required />
         </div>
       </div>
     </div>
@@ -611,14 +611,14 @@ Acompanhe sua solicitação com o protocolo: ${protocol}`;
 
   function shareOutlook() {
     const body = encodeURIComponent(buildMailtoBody());
-    window.location.href = `mailto:beatriz.lima@empresa.com?subject=${buildSubjectPat()}&body=${body}`;
+    window.location.href = `mailto:thereza.gerhard@rededor.com.br?subject=${buildSubjectPat()}&body=${body}`;
     closeAllShareMenus();
     showToast('✅ Abrindo Outlook...');
   }
 
   function shareGmail() {
     const body = encodeURIComponent(buildMailtoBody());
-    window.open(`https://mail.google.com/mail/?view=cm&fs=1&to=beatriz.lima@empresa.com&su=${buildSubjectPat()}&body=${body}`, '_blank');
+    window.open(`https://mail.google.com/mail/?view=cm&fs=1&to=thereza.gerhard@rededor.com.br&su=${buildSubjectPat()}&body=${body}`, '_blank');
     closeAllShareMenus();
     showToast('✅ Abrindo Gmail...');
   }
