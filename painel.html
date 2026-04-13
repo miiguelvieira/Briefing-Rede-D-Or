@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Painel do Analista · Rede D'Or</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0f1117; --surface: #1a1d27; --surface2: #22263a; --border: #2e3350;
+      --text: #e8eaf6; --muted: #8892b0;
+      --accent: #a855f7; --accent-glow: rgba(168,85,247,0.3); --accent-bg: rgba(168,85,247,0.08);
+      --art: #a855f7; --art-bg: rgba(168,85,247,0.1);
+      --evt: #10b981; --evt-bg: rgba(16,185,129,0.1);
+      --pat: #f59e0b; --pat-bg: rgba(245,158,11,0.1);
+    }
+    body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; min-height: 100vh; }
+
+    /* TOPBAR */
+    .topbar {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(15,17,23,.9); backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 16px; padding: 12px 24px;
+    }
+    .back-btn {
+      display: flex; align-items: center; gap: 8px; color: var(--muted);
+      text-decoration: none; font-size: .88rem; transition: color .15s; flex-shrink: 0;
+    }
+    .back-btn:hover { color: var(--text); }
+    .topbar-title { font-weight: 700; font-size: .95rem; }
+    .topbar-badge {
+      background: var(--art-bg); border: 1px solid rgba(168,85,247,.25);
+      border-radius: 999px; padding: 3px 10px;
+      font-size: .72rem; font-weight: 700; color: var(--art);
+      text-transform: uppercase; letter-spacing: .06em;
+    }
+    .topbar-right { display: flex; align-items: center; gap: 12px; margin-left: auto; }
+    .avatar {
+      width: 34px; height: 34px; border-radius: 50%;
+      background: var(--accent-bg); border: 1px solid var(--accent);
+      display: flex; align-items: center; justify-content: center;
+      font-size: .78rem; font-weight: 700; color: var(--accent); flex-shrink: 0;
+    }
+    .user-name { font-size: .88rem; font-weight: 600; }
+    .btn-logout {
+      background: none; border: none; color: var(--muted); cursor: pointer;
+      display: flex; align-items: center; padding: 6px; border-radius: 8px;
+      transition: color .15s, background .15s;
+    }
+    .btn-logout:hover { color: #ef4444; background: rgba(239,68,68,.08); }
+
+    /* TABS */
+    .tabs-bar {
+      display: flex; gap: 0; border-bottom: 1px solid var(--border);
+      padding: 0 24px; background: var(--bg);
+    }
+    .tab-btn {
+      padding: 14px 24px; background: none; border: none; border-bottom: 2px solid transparent;
+      color: var(--muted); font-size: .92rem; font-weight: 600; font-family: inherit;
+      cursor: pointer; transition: all .15s; margin-bottom: -1px;
+    }
+    .tab-btn:hover { color: var(--text); }
+    .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+    /* PAGE */
+    .page { max-width: 1200px; margin: 0 auto; padding: 28px 24px 80px; }
+
+    /* FILTER ROW */
+    .filter-row {
+      display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 20px;
+    }
+    .filter-group { display: flex; gap: 6px; flex-wrap: wrap; }
+    .pill {
+      padding: 6px 14px; border-radius: 999px; border: 1px solid var(--border);
+      background: var(--surface); color: var(--muted); font-size: .82rem; font-weight: 600;
+      cursor: pointer; transition: all .15s; white-space: nowrap; font-family: inherit;
+    }
+    .pill:hover { border-color: var(--accent); color: var(--text); }
+    .pill.active { background: var(--accent-bg); border-color: var(--accent); color: var(--accent); }
+    .pill.art-pill.active { background: var(--art-bg); border-color: var(--art); color: var(--art); }
+    .pill.evt-pill.active { background: var(--evt-bg); border-color: var(--evt); color: var(--evt); }
+    .pill.pat-pill.active { background: var(--pat-bg); border-color: var(--pat); color: var(--pat); }
+    .filter-select {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 8px; padding: 7px 12px; color: var(--text);
+      font-size: .82rem; font-family: inherit; outline: none; cursor: pointer;
+    }
+    .filter-select option { background: var(--surface2); }
+    .search-box {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 8px; padding: 7px 12px; color: var(--text);
+      font-size: .82rem; font-family: inherit; outline: none;
+      transition: border-color .15s; width: 200px;
+    }
+    .search-box:focus { border-color: var(--accent); }
+    .search-box::placeholder { color: var(--muted); opacity: .6; }
+    .filter-dates { display: flex; gap: 6px; align-items: center; }
+    .filter-dates input[type="date"] {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 8px; padding: 7px 10px; color: var(--text);
+      font-size: .82rem; font-family: inherit; outline: none;
+    }
+    .filter-dates input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacity(.4); }
+    .filter-dates span { color: var(--muted); font-size: .82rem; }
+    .filter-count { margin-left: auto; color: var(--muted); font-size: .82rem; }
+
+    /* TICKETS TABLE */
+    .table-wrap { overflow-x: auto; border-radius: 14px; border: 1px solid var(--border); }
+    table { width: 100%; border-collapse: collapse; min-width: 800px; }
+    thead { background: var(--surface2); }
+    th {
+      padding: 12px 14px; text-align: left; font-size: .75rem; font-weight: 700;
+      color: var(--muted); text-transform: uppercase; letter-spacing: .06em;
+      white-space: nowrap; cursor: pointer; user-select: none;
+    }
+    th:hover { color: var(--text); }
+    th .sort-icon { margin-left: 4px; opacity: .4; }
+    th.sorted .sort-icon { opacity: 1; color: var(--accent); }
+    tbody tr { border-top: 1px solid var(--border); transition: background .12s; }
+    tbody tr:hover { background: var(--surface2); }
+    td { padding: 12px 14px; font-size: .88rem; vertical-align: middle; }
+    td.mono { font-family: monospace; font-weight: 700; font-size: .85rem; }
+    td.mono.art { color: var(--art); }
+    td.mono.evt { color: var(--evt); }
+    td.mono.pat { color: var(--pat); }
+    .type-pill {
+      font-size: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em;
+      padding: 3px 8px; border-radius: 999px;
+    }
+    .type-pill.art { background: var(--art-bg); color: var(--art); }
+    .type-pill.evt { background: var(--evt-bg); color: var(--evt); }
+    .type-pill.pat { background: var(--pat-bg); color: var(--pat); }
+    .status-badge {
+      font-size: .73rem; font-weight: 700; padding: 3px 9px; border-radius: 999px; white-space: nowrap;
+    }
+    .status-badge.aberto      { background: rgba(59,130,246,.12); color: #3b82f6; }
+    .status-badge.em_andamento{ background: rgba(245,158,11,.12);  color: #f59e0b; }
+    .status-badge.resolvido   { background: rgba(16,185,129,.12);  color: #10b981; }
+    .status-badge.fechado     { background: rgba(136,146,176,.12); color: #8892b0; }
+    .priority-badge {
+      font-size: .73rem; font-weight: 700; padding: 3px 9px; border-radius: 999px;
+    }
+    .priority-badge.urgente { background: rgba(239,68,68,.12);   color: #ef4444; }
+    .priority-badge.alto    { background: rgba(245,158,11,.12);  color: #f59e0b; }
+    .priority-badge.normal  { background: rgba(136,146,176,.1);  color: #8892b0; }
+    .sla-badge { font-size: .73rem; font-weight: 700; padding: 3px 8px; border-radius: 999px; }
+    .sla-badge.no_prazo { background: rgba(16,185,129,.1); color: #10b981; }
+    .sla-badge.urgencia { background: rgba(245,158,11,.1);  color: #f59e0b; }
+    .sla-badge.atrasado { background: rgba(239,68,68,.1);   color: #ef4444; }
+    .td-actions { display: flex; gap: 6px; }
+    .btn-icon {
+      background: none; border: none; color: var(--muted); cursor: pointer;
+      padding: 5px; border-radius: 6px; transition: color .15s, background .15s;
+      display: flex; align-items: center;
+    }
+    .btn-icon:hover { color: var(--accent); background: var(--accent-bg); }
+
+    /* MODAL */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0; z-index: 200;
+      background: rgba(0,0,0,.7); backdrop-filter: blur(4px);
+      align-items: center; justify-content: center; padding: 24px;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 20px; padding: 32px; width: 100%; max-width: 480px;
+      animation: fadeUp .22s ease;
+    }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+    .modal h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 6px; }
+    .modal .modal-sub { color: var(--muted); font-size: .85rem; margin-bottom: 24px; font-family: monospace; }
+    .field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+    .field label { font-size: .82rem; font-weight: 600; color: var(--muted); }
+    .field select, .field textarea {
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 10px; padding: 11px 14px; color: var(--text);
+      font-size: .93rem; font-family: inherit; outline: none;
+      transition: border-color .15s; width: 100%;
+    }
+    .field select:focus, .field textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
+    .field select option { background: var(--surface2); }
+    .field textarea { resize: vertical; min-height: 90px; }
+    .modal-actions { display: flex; gap: 10px; margin-top: 8px; }
+    .btn-cancel {
+      flex: 1; padding: 12px; border-radius: 10px; border: 1px solid var(--border);
+      background: var(--surface2); color: var(--muted); font-size: .93rem; font-weight: 600;
+      font-family: inherit; cursor: pointer; transition: all .15s;
+    }
+    .btn-cancel:hover { color: var(--text); border-color: var(--text); }
+    .btn-save {
+      flex: 1; padding: 12px; border-radius: 10px; border: none;
+      background: var(--accent); color: #fff; font-size: .93rem; font-weight: 700;
+      font-family: inherit; cursor: pointer; transition: all .18s;
+      box-shadow: 0 4px 16px rgba(168,85,247,.3);
+    }
+    .btn-save:hover { filter: brightness(1.1); }
+
+    /* REPORTS TAB */
+    .summary-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: 16px; margin-bottom: 28px;
+    }
+    .summary-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 14px; padding: 20px 22px;
+    }
+    .summary-card .s-label { font-size: .75rem; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; font-weight: 600; margin-bottom: 8px; }
+    .summary-card .s-value { font-size: 2.2rem; font-weight: 800; letter-spacing: -.03em; }
+    .summary-card .s-sub { font-size: .8rem; color: var(--muted); margin-top: 4px; }
+    .summary-card.accent-art .s-value { color: var(--art); }
+    .summary-card.accent-evt .s-value { color: var(--evt); }
+    .summary-card.accent-pat .s-value { color: var(--pat); }
+    .summary-card.accent-blue .s-value { color: #3b82f6; }
+    .summary-card.accent-green .s-value { color: #10b981; }
+
+    .charts-grid {
+      display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-bottom: 28px;
+    }
+    .chart-container {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 16px; padding: 22px;
+    }
+    .chart-container h4 { font-size: .88rem; font-weight: 700; margin-bottom: 16px; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
+    .chart-container canvas { max-height: 260px; }
+    .chart-full { grid-column: 1 / -1; }
+
+    /* WORKLOAD TABLE */
+    .workload-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 14px; overflow: hidden; margin-bottom: 28px;
+    }
+    .workload-card h4 { padding: 16px 20px; font-size: .88rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; border-bottom: 1px solid var(--border); }
+    .workload-table { width: 100%; border-collapse: collapse; }
+    .workload-table th { padding: 10px 20px; text-align: left; font-size: .75rem; color: var(--muted); font-weight: 700; text-transform: uppercase; letter-spacing: .06em; }
+    .workload-table td { padding: 12px 20px; font-size: .88rem; border-top: 1px solid var(--border); }
+    .workload-bar { height: 6px; background: var(--border); border-radius: 3px; margin-top: 4px; }
+    .workload-bar-fill { height: 100%; border-radius: 3px; background: var(--accent); }
+
+    /* HIDDEN */
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    @media (max-width: 768px) {
+      .charts-grid { grid-template-columns: 1fr; }
+      .chart-full { grid-column: 1; }
+      .user-name { display: none; }
+      .filter-dates { flex-wrap: wrap; }
+      .page { padding: 20px 16px 60px; }
+    }
+    @media (max-width: 580px) {
+      .filter-row { gap: 8px; }
+      .summary-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="topbar">
+    <a href="index.html" class="back-btn">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <path d="M19 12H5M12 19l-7-7 7-7"/>
+      </svg>
+    </a>
+    <span class="topbar-title">Painel do Analista</span>
+    <span class="topbar-badge">Analista</span>
+    <div class="topbar-right">
+      <div class="avatar" id="userAvatar">AS</div>
+      <span class="user-name" id="userName"></span>
+      <button class="btn-logout" id="btnLogout" title="Sair">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="tabs-bar">
+    <button class="tab-btn active" data-tab="chamados">📋 Chamados</button>
+    <button class="tab-btn" data-tab="relatorios">📊 Relatórios</button>
+  </div>
+
+  <!-- TAB: CHAMADOS -->
+  <div class="tab-content active" id="tab-chamados">
+    <div class="page">
+      <div class="filter-row">
+        <div class="filter-group" id="typeFilter">
+          <button class="pill active" data-type="todos">Todos</button>
+          <button class="pill art-pill" data-type="ART">🎨 ART</button>
+          <button class="pill evt-pill" data-type="EVT">🎪 EVT</button>
+          <button class="pill pat-pill" data-type="PAT">🤝 PAT</button>
+        </div>
+        <div class="filter-group" id="statusFilter">
+          <button class="pill active" data-status="todos">Todos status</button>
+          <button class="pill" data-status="aberto">Aberto</button>
+          <button class="pill" data-status="em_andamento">Em Andamento</button>
+          <button class="pill" data-status="resolvido">Resolvido</button>
+          <button class="pill" data-status="fechado">Fechado</button>
+        </div>
+        <select class="filter-select" id="analystFilter">
+          <option value="todos">Todos analistas</option>
+        </select>
+        <input type="text" class="search-box" id="tableSearch" placeholder="Buscar protocolo..." />
+        <div class="filter-dates">
+          <input type="date" id="dateFrom" />
+          <span>até</span>
+          <input type="date" id="dateTo" />
+        </div>
+        <span class="filter-count" id="filterCount"></span>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th data-col="id">Protocolo <span class="sort-icon">↕</span></th>
+              <th>Tipo</th>
+              <th data-col="title">Título <span class="sort-icon">↕</span></th>
+              <th data-col="priority">Prioridade <span class="sort-icon">↕</span></th>
+              <th data-col="status">Status <span class="sort-icon">↕</span></th>
+              <th>Usuário</th>
+              <th>Analista</th>
+              <th data-col="createdAt">Criado <span class="sort-icon">↕</span></th>
+              <th data-col="deadline">Prazo <span class="sort-icon">↕</span></th>
+              <th>SLA</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody id="ticketsBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB: RELATÓRIOS -->
+  <div class="tab-content" id="tab-relatorios">
+    <div class="page">
+
+      <div class="summary-grid" id="summaryGrid"></div>
+
+      <div class="charts-grid">
+        <div class="chart-container">
+          <h4>Distribuição por Tipo</h4>
+          <canvas id="chartTipo"></canvas>
+        </div>
+        <div class="chart-container">
+          <h4>Chamados por Status</h4>
+          <canvas id="chartStatus"></canvas>
+        </div>
+        <div class="chart-container chart-full">
+          <h4>SLA por Tipo de Chamado</h4>
+          <canvas id="chartSla"></canvas>
+        </div>
+      </div>
+
+      <div class="workload-card">
+        <h4>Workload por Analista</h4>
+        <table class="workload-table">
+          <thead>
+            <tr>
+              <th>Analista</th>
+              <th>Abertos</th>
+              <th>Em Andamento</th>
+              <th>Total Ativo</th>
+              <th>Volume</th>
+            </tr>
+          </thead>
+          <tbody id="workloadBody"></tbody>
+        </table>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- EDIT MODAL -->
+  <div class="modal-overlay" id="editModal">
+    <div class="modal">
+      <h3>Atualizar Chamado</h3>
+      <div class="modal-sub" id="editModalId"></div>
+      <div class="field">
+        <label>Status</label>
+        <select id="editStatus">
+          <option value="aberto">Aberto</option>
+          <option value="em_andamento">Em Andamento</option>
+          <option value="resolvido">Resolvido</option>
+          <option value="fechado">Fechado</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Prioridade</label>
+        <select id="editPriority">
+          <option value="normal">Normal</option>
+          <option value="alto">Alto</option>
+          <option value="urgente">Urgente</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Analista Responsável</label>
+        <select id="editAnalyst"></select>
+      </div>
+      <div class="field">
+        <label>Nota / Observação</label>
+        <textarea id="editNote" placeholder="Descreva a atualização..."></textarea>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-cancel" id="btnCancelEdit">Cancelar</button>
+        <button class="btn-save" id="btnSaveEdit">Salvar atualização</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+/* ─── AUTH GUARD ─────────────────────────────────────────────────────────── */
+const session = JSON.parse(localStorage.getItem('sdr_session') || 'null');
+if (!session || Date.now() > session.expiresAt) {
+  localStorage.removeItem('sdr_session');
+  window.location.href = 'login.html';
+}
+if (session && session.role === 'user') {
+  window.location.href = 'portal.html';
+}
+
+const isAdmin = session && session.role === 'admin';
+
+/* ─── HELPERS ────────────────────────────────────────────────────────────── */
+const allUsers = JSON.parse(localStorage.getItem('sdr_users') || '[]');
+const analysts = allUsers.filter(u => u.role === 'analyst');
+
+function getTickets() { return JSON.parse(localStorage.getItem('sdr_tickets') || '[]'); }
+function saveTickets(t) { localStorage.setItem('sdr_tickets', JSON.stringify(t)); }
+
+// Tickets visible to the current user (admin = all, analyst = their sector only)
+function getScopedTickets() {
+  const all = getTickets();
+  if (isAdmin || !session.sector) return all;
+  return all.filter(t => t.type === session.sector);
+}
+
+function userName(id) {
+  if (!id) return 'Não atribuído';
+  const u = allUsers.find(u => u.id === id);
+  return u ? u.name : '—';
+}
+function fmtDate(iso) {
+  if (!iso) return '—';
+  return new Date(iso).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+}
+function fmtDateTime(iso) {
+  if (!iso) return '—';
+  return new Date(iso).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+}
+function statusLabel(s) {
+  return { aberto: 'Aberto', em_andamento: 'Em Andamento', resolvido: 'Resolvido', fechado: 'Fechado' }[s] || s;
+}
+function typeLabel(t) { return { ART: '🎨 Criação', EVT: '🎪 Eventos', PAT: '🤝 Patrocínio' }[t] || t; }
+
+const PRIORITY_ORDER = { urgente: 0, alto: 1, normal: 2 };
+
+/* ─── TOPBAR ─────────────────────────────────────────────────────────────── */
+document.getElementById('userAvatar').textContent = session.initials || session.name.slice(0, 2).toUpperCase();
+document.getElementById('userName').textContent = session.name;
+document.getElementById('btnLogout').addEventListener('click', () => {
+  localStorage.removeItem('sdr_session');
+  window.location.href = 'login.html';
+});
+
+// Set title and badge based on role/sector
+const topbarTitle = document.querySelector('.topbar-title');
+const topbarBadge = document.querySelector('.topbar-badge');
+const sectorMeta = { ART: { label: '🎨 Criação', color: '#a855f7', bg: 'rgba(168,85,247,0.1)', border: 'rgba(168,85,247,0.25)' }, EVT: { label: '🎪 Eventos', color: '#10b981', bg: 'rgba(16,185,129,0.1)', border: 'rgba(16,185,129,0.25)' }, PAT: { label: '🤝 Patrocínio', color: '#f59e0b', bg: 'rgba(245,158,11,0.1)', border: 'rgba(245,158,11,0.25)' } };
+
+if (isAdmin) {
+  topbarTitle.textContent = 'Painel Administrativo';
+  topbarBadge.textContent = '👑 Admin';
+  topbarBadge.style.cssText = 'background:rgba(245,158,11,0.12);border-color:rgba(245,158,11,0.3);color:#f59e0b';
+} else if (session.sector && sectorMeta[session.sector]) {
+  const m = sectorMeta[session.sector];
+  topbarTitle.textContent = 'Painel Analista';
+  topbarBadge.textContent = m.label;
+  topbarBadge.style.cssText = `background:${m.bg};border-color:${m.border};color:${m.color}`;
+}
+
+// Hide type filter pills for non-admin analysts (they only see their own sector)
+if (!isAdmin) {
+  const typeFilterEl = document.getElementById('typeFilter');
+  if (typeFilterEl) typeFilterEl.style.display = 'none';
+}
+
+/* ─── TABS ───────────────────────────────────────────────────────────────── */
+let chartsInitialized = false;
+
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+    if (btn.dataset.tab === 'relatorios') renderReports();
+  });
+});
+
+/* ─── TICKETS TABLE STATE ────────────────────────────────────────────────── */
+let filterType = 'todos';
+let filterStatus = 'todos';
+let filterAnalyst = 'todos';
+let filterSearch = '';
+let filterDateFrom = '';
+let filterDateTo = '';
+let sortCol = 'priority';
+let sortDir = 'asc';
+
+/* ─── BUILD ANALYST FILTER ───────────────────────────────────────────────── */
+const analystSel = document.getElementById('analystFilter');
+analysts.forEach(a => {
+  const opt = document.createElement('option');
+  opt.value = a.id;
+  opt.textContent = a.name;
+  analystSel.appendChild(opt);
+});
+
+/* ─── EDIT ANALYST SELECT ────────────────────────────────────────────────── */
+const editAnalystSel = document.getElementById('editAnalyst');
+const optNone = document.createElement('option');
+optNone.value = ''; optNone.textContent = 'Não atribuído';
+editAnalystSel.appendChild(optNone);
+analysts.forEach(a => {
+  const opt = document.createElement('option');
+  opt.value = a.id;
+  opt.textContent = a.name;
+  editAnalystSel.appendChild(opt);
+});
+
+/* ─── FILTER EVENTS ──────────────────────────────────────────────────────── */
+document.getElementById('typeFilter').addEventListener('click', e => {
+  if (!e.target.classList.contains('pill')) return;
+  document.querySelectorAll('#typeFilter .pill').forEach(p => p.classList.remove('active'));
+  e.target.classList.add('active');
+  filterType = e.target.dataset.type;
+  renderTable();
+});
+
+document.getElementById('statusFilter').addEventListener('click', e => {
+  if (!e.target.classList.contains('pill')) return;
+  document.querySelectorAll('#statusFilter .pill').forEach(p => p.classList.remove('active'));
+  e.target.classList.add('active');
+  filterStatus = e.target.dataset.status;
+  renderTable();
+});
+
+analystSel.addEventListener('change', e => { filterAnalyst = e.target.value; renderTable(); });
+document.getElementById('tableSearch').addEventListener('input', e => { filterSearch = e.target.value.trim().toUpperCase(); renderTable(); });
+document.getElementById('dateFrom').addEventListener('change', e => { filterDateFrom = e.target.value; renderTable(); });
+document.getElementById('dateTo').addEventListener('change', e => { filterDateTo = e.target.value; renderTable(); });
+
+/* ─── SORT ───────────────────────────────────────────────────────────────── */
+document.querySelectorAll('th[data-col]').forEach(th => {
+  th.addEventListener('click', () => {
+    const col = th.dataset.col;
+    if (sortCol === col) { sortDir = sortDir === 'asc' ? 'desc' : 'asc'; }
+    else { sortCol = col; sortDir = 'asc'; }
+    document.querySelectorAll('th').forEach(t => t.classList.remove('sorted'));
+    th.classList.add('sorted');
+    th.querySelector('.sort-icon').textContent = sortDir === 'asc' ? '↑' : '↓';
+    renderTable();
+  });
+});
+
+/* ─── RENDER TABLE ───────────────────────────────────────────────────────── */
+function applyFilters(tickets) {
+  return tickets.filter(t => {
+    // Type filter only available for admin
+    if (isAdmin && filterType !== 'todos' && t.type !== filterType) return false;
+    if (filterStatus !== 'todos' && t.status !== filterStatus) return false;
+    if (filterAnalyst !== 'todos' && String(t.analystId) !== String(filterAnalyst)) return false;
+    if (filterSearch && !t.id.includes(filterSearch) && !t.title.toUpperCase().includes(filterSearch)) return false;
+    if (filterDateFrom && t.createdAt < filterDateFrom) return false;
+    if (filterDateTo && t.createdAt.slice(0, 10) > filterDateTo) return false;
+    return true;
+  });
+}
+
+function sortTickets(tickets) {
+  return [...tickets].sort((a, b) => {
+    let va = a[sortCol], vb = b[sortCol];
+    if (sortCol === 'priority') { va = PRIORITY_ORDER[a.priority] ?? 3; vb = PRIORITY_ORDER[b.priority] ?? 3; }
+    if (va === null || va === undefined) va = '';
+    if (vb === null || vb === undefined) vb = '';
+    if (va < vb) return sortDir === 'asc' ? -1 : 1;
+    if (va > vb) return sortDir === 'asc' ? 1 : -1;
+    return 0;
+  });
+}
+
+function renderTable() {
+  const base = getScopedTickets();
+  const filtered = applyFilters(base);
+  const sorted = sortTickets(filtered);
+
+  document.getElementById('filterCount').textContent = `${sorted.length} de ${base.length} chamados`;
+
+  const body = document.getElementById('ticketsBody');
+  if (sorted.length === 0) {
+    body.innerHTML = `<tr><td colspan="11" style="text-align:center;color:var(--muted);padding:40px;">Nenhum chamado corresponde aos filtros selecionados.</td></tr>`;
+    return;
+  }
+
+  body.innerHTML = sorted.map(t => {
+    const tc = t.type.toLowerCase();
+    return `
+    <tr>
+      <td class="mono ${tc}">${t.id}</td>
+      <td><span class="type-pill ${tc}">${t.type}</span></td>
+      <td style="max-width:200px;white-space:normal;">${t.title}</td>
+      <td><span class="priority-badge ${t.priority}">${{urgente:'Urgente',alto:'Alto',normal:'Normal'}[t.priority]}</span></td>
+      <td><span class="status-badge ${t.status}">${statusLabel(t.status)}</span></td>
+      <td style="color:var(--muted)">${userName(t.userId)}</td>
+      <td style="color:var(--muted)">${userName(t.analystId)}</td>
+      <td style="color:var(--muted);white-space:nowrap">${fmtDate(t.createdAt)}</td>
+      <td style="color:var(--muted);white-space:nowrap">${fmtDate(t.deadline)}</td>
+      <td>${t.resolvedAt ? `<span class="sla-badge ${t.slaStatus}">${{no_prazo:'No Prazo',urgencia:'Urgência',atrasado:'Atrasado'}[t.slaStatus]}</span>` : '—'}</td>
+      <td>
+        <div class="td-actions">
+          <button class="btn-icon" data-edit="${t.id}" title="Editar">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+            </svg>
+          </button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+
+  body.querySelectorAll('[data-edit]').forEach(btn => {
+    btn.addEventListener('click', () => openEditModal(btn.dataset.edit));
+  });
+}
+
+/* ─── EDIT MODAL ─────────────────────────────────────────────────────────── */
+let editingId = null;
+
+function openEditModal(id) {
+  const tickets = getTickets();
+  const t = tickets.find(x => x.id === id);
+  if (!t) return;
+  editingId = id;
+  document.getElementById('editModalId').textContent = t.id + ' · ' + t.title.slice(0, 50);
+  document.getElementById('editStatus').value = t.status;
+  document.getElementById('editPriority').value = t.priority;
+  document.getElementById('editAnalyst').value = t.analystId || '';
+  document.getElementById('editNote').value = '';
+  document.getElementById('editModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeEditModal() {
+  document.getElementById('editModal').classList.remove('open');
+  document.body.style.overflow = '';
+  editingId = null;
+}
+
+document.getElementById('btnCancelEdit').addEventListener('click', closeEditModal);
+document.getElementById('editModal').addEventListener('click', e => {
+  if (e.target === document.getElementById('editModal')) closeEditModal();
+});
+
+document.getElementById('btnSaveEdit').addEventListener('click', () => {
+  if (!editingId) return;
+  const newStatus = document.getElementById('editStatus').value;
+  const newPriority = document.getElementById('editPriority').value;
+  const newAnalyst = document.getElementById('editAnalyst').value;
+  const note = document.getElementById('editNote').value.trim();
+
+  if (!note) {
+    document.getElementById('editNote').style.borderColor = '#ef4444';
+    document.getElementById('editNote').focus();
+    return;
+  }
+  document.getElementById('editNote').style.borderColor = '';
+
+  const tickets = getTickets();
+  const idx = tickets.findIndex(t => t.id === editingId);
+  if (idx === -1) return;
+
+  const now = new Date().toISOString();
+  const t = tickets[idx];
+  const prevStatus = t.status;
+
+  t.status = newStatus;
+  t.priority = newPriority;
+  t.analystId = newAnalyst ? parseInt(newAnalyst) : null;
+  t.updatedAt = now;
+
+  if ((newStatus === 'resolvido' || newStatus === 'fechado') && !t.resolvedAt) {
+    t.resolvedAt = now;
+    const deadline = t.deadline ? new Date(t.deadline) : null;
+    if (deadline && new Date(now) > deadline) {
+      t.slaStatus = 'atrasado';
+    } else if (t.priority === 'urgente') {
+      t.slaStatus = 'urgencia';
+    } else {
+      t.slaStatus = 'no_prazo';
+    }
+  }
+
+  const historyEntry = {
+    date: now,
+    status: newStatus,
+    note: note,
+    author: session.name
+  };
+  t.history = [...(t.history || []), historyEntry];
+  tickets[idx] = t;
+  saveTickets(tickets);
+
+  closeEditModal();
+  renderTable();
+});
+
+/* ─── REPORTS ────────────────────────────────────────────────────────────── */
+let chartTipo = null, chartStatus = null, chartSla = null;
+
+function renderReports() {
+  const tickets = getScopedTickets();
+  const total = tickets.length;
+  const abertos = tickets.filter(t => t.status === 'aberto').length;
+  const resolvidos = tickets.filter(t => t.status === 'resolvido' || t.status === 'fechado').length;
+  const resolved = tickets.filter(t => t.resolvedAt);
+  const noPrazo = resolved.filter(t => t.slaStatus === 'no_prazo').length;
+  const slaPct = resolved.length ? Math.round((noPrazo / resolved.length) * 100) : 0;
+
+  document.getElementById('summaryGrid').innerHTML = `
+    <div class="summary-card">
+      <div class="s-label">Total de Chamados</div>
+      <div class="s-value" style="color:var(--text)">${total}</div>
+      <div class="s-sub">desde o início</div>
+    </div>
+    <div class="summary-card accent-blue">
+      <div class="s-label">Abertos</div>
+      <div class="s-value">${abertos}</div>
+      <div class="s-sub">aguardando ação</div>
+    </div>
+    <div class="summary-card accent-green">
+      <div class="s-label">Resolvidos</div>
+      <div class="s-value">${resolvidos}</div>
+      <div class="s-sub">concluídos</div>
+    </div>
+    <div class="summary-card accent-green">
+      <div class="s-label">Em SLA</div>
+      <div class="s-value">${slaPct}%</div>
+      <div class="s-sub">${noPrazo} de ${resolved.length} no prazo</div>
+    </div>
+  `;
+
+  // Count by type
+  const artCount = tickets.filter(t => t.type === 'ART').length;
+  const evtCount = tickets.filter(t => t.type === 'EVT').length;
+  const patCount = tickets.filter(t => t.type === 'PAT').length;
+
+  // Count by status
+  const stAberto = tickets.filter(t => t.status === 'aberto').length;
+  const stAndamento = tickets.filter(t => t.status === 'em_andamento').length;
+  const stResolvido = tickets.filter(t => t.status === 'resolvido').length;
+  const stFechado = tickets.filter(t => t.status === 'fechado').length;
+
+  // SLA by type
+  function slaByType(type, slaStatus) {
+    return tickets.filter(t => t.type === type && t.slaStatus === slaStatus).length;
+  }
+
+  Chart.defaults.color = '#8892b0';
+  Chart.defaults.font.family = "'Segoe UI', system-ui, sans-serif";
+  Chart.defaults.borderColor = '#2e3350';
+
+  if (chartTipo) chartTipo.destroy();
+  if (chartStatus) chartStatus.destroy();
+  if (chartSla) chartSla.destroy();
+
+  chartTipo = new Chart(document.getElementById('chartTipo'), {
+    type: 'doughnut',
+    data: {
+      labels: ['ART – Criação', 'EVT – Eventos', 'PAT – Patrocínio'],
+      datasets: [{
+        data: [artCount, evtCount, patCount],
+        backgroundColor: ['#a855f7', '#10b981', '#f59e0b'],
+        borderColor: '#1a1d27',
+        borderWidth: 3,
+        hoverOffset: 10
+      }]
+    },
+    options: {
+      responsive: true,
+      cutout: '65%',
+      plugins: {
+        legend: { position: 'bottom', labels: { color: '#e8eaf6', padding: 16, font: { size: 12 } } },
+        tooltip: { callbacks: { label: ctx => ` ${ctx.label}: ${ctx.parsed} chamados` } }
+      }
+    }
+  });
+
+  chartStatus = new Chart(document.getElementById('chartStatus'), {
+    type: 'bar',
+    data: {
+      labels: ['Aberto', 'Em Andamento', 'Resolvido', 'Fechado'],
+      datasets: [{
+        label: 'Chamados',
+        data: [stAberto, stAndamento, stResolvido, stFechado],
+        backgroundColor: ['#3b82f6', '#f59e0b', '#10b981', '#8892b0'],
+        borderRadius: 8,
+        borderSkipped: false
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { ticks: { color: '#8892b0' }, grid: { color: '#2e3350' } },
+        y: { ticks: { color: '#8892b0', stepSize: 1 }, grid: { color: '#2e3350' }, beginAtZero: true }
+      }
+    }
+  });
+
+  chartSla = new Chart(document.getElementById('chartSla'), {
+    type: 'bar',
+    data: {
+      labels: ['ART – Criação', 'EVT – Eventos', 'PAT – Patrocínio'],
+      datasets: [
+        {
+          label: 'No Prazo',
+          data: [slaByType('ART','no_prazo'), slaByType('EVT','no_prazo'), slaByType('PAT','no_prazo')],
+          backgroundColor: '#10b981', borderRadius: 4
+        },
+        {
+          label: 'Com Urgência',
+          data: [slaByType('ART','urgencia'), slaByType('EVT','urgencia'), slaByType('PAT','urgencia')],
+          backgroundColor: '#f59e0b'
+        },
+        {
+          label: 'Atrasado',
+          data: [slaByType('ART','atrasado'), slaByType('EVT','atrasado'), slaByType('PAT','atrasado')],
+          backgroundColor: '#ef4444'
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { labels: { color: '#e8eaf6', font: { size: 12 } } } },
+      scales: {
+        x: { stacked: true, ticks: { color: '#8892b0' }, grid: { color: '#2e3350' } },
+        y: { stacked: true, ticks: { color: '#8892b0', stepSize: 1 }, grid: { color: '#2e3350' }, beginAtZero: true }
+      }
+    }
+  });
+
+  // Workload — admin sees all analysts; analyst sees only themselves
+  const workloadAnalysts = isAdmin ? analysts : analysts.filter(a => a.id === session.userId);
+  const maxOpen = Math.max(...workloadAnalysts.map(a => tickets.filter(t => t.analystId === a.id && (t.status === 'aberto' || t.status === 'em_andamento')).length), 1);
+
+  document.getElementById('workloadBody').innerHTML = workloadAnalysts.map(a => {
+    const myTickets = tickets.filter(t => t.analystId === a.id);
+    const myAbertos  = myTickets.filter(t => t.status === 'aberto').length;
+    const myAndamento = myTickets.filter(t => t.status === 'em_andamento').length;
+    const myAtivo = myAbertos + myAndamento;
+    const pct = Math.round((myAtivo / maxOpen) * 100);
+    return `
+      <tr>
+        <td><strong>${a.name}</strong><br><span style="font-size:.78rem;color:var(--muted)">${a.department}</span></td>
+        <td>${myAbertos}</td>
+        <td>${myAndamento}</td>
+        <td><strong>${myAtivo}</strong></td>
+        <td style="min-width:120px">
+          <div class="workload-bar">
+            <div class="workload-bar-fill" style="width:${pct}%"></div>
+          </div>
+        </td>
+      </tr>`;
+  }).join('');
+
+  chartsInitialized = true;
+}
+
+/* ─── INIT ───────────────────────────────────────────────────────────────── */
+renderTable();
+</script>
+</body>
+</html>

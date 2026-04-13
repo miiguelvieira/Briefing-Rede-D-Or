@@ -619,8 +619,9 @@ Acompanhe sua solicitação com o protocolo: ${protocol}`;
 
   function shareGmail() {
     const body = encodeURIComponent(buildMailtoBody());
-    window.open(`https://mail.google.com/mail/?view=cm&fs=1&to=carlos.mendes@empresa.com&su=${buildSubjectEvt()}&body=${body}`, '_blank');
+    window.open(`https://mail.google.com/mail/?view=cm&fs=1&to=isabelle.monteiro@rededor.com.br&su=${buildSubjectEvt()}&body=${body}`, '_blank');
     closeAllShareMenus();
+    persistTicketIfLoggedIn();
     showToast('✅ Abrindo Gmail...');
   }
 
@@ -628,6 +629,7 @@ Acompanhe sua solicitação com o protocolo: ${protocol}`;
     const text = encodeURIComponent(buildMailtoBody());
     window.open(`https://wa.me/?text=${text}`, '_blank');
     closeAllShareMenus();
+    persistTicketIfLoggedIn();
     showToast('✅ Abrindo WhatsApp...');
   }
 
@@ -643,6 +645,30 @@ Acompanhe sua solicitação com o protocolo: ${protocol}`;
     t.textContent = msg;
     t.classList.add('show');
     setTimeout(() => t.classList.remove('show'), 3000);
+  }
+
+  function persistTicketIfLoggedIn() {
+    try {
+      const raw = localStorage.getItem('sdr_session');
+      if (!raw) return;
+      const session = JSON.parse(raw);
+      if (Date.now() > session.expiresAt) return;
+      const tickets = JSON.parse(localStorage.getItem('sdr_tickets') || '[]');
+      if (tickets.find(t => t.id === protocol)) return;
+      const now = new Date().toISOString();
+      const dataEvt = val('dataEvento');
+      tickets.push({
+        id: protocol, type: 'EVT',
+        title: val('nomeEvento') || 'Briefing de Eventos',
+        status: 'aberto', priority: 'normal',
+        userId: session.userId, analystId: null,
+        createdAt: now, updatedAt: now,
+        deadline: dataEvt ? new Date(dataEvt).toISOString() : null,
+        resolvedAt: null, slaStatus: 'no_prazo',
+        history: [{ date: now, status: 'aberto', note: 'Ticket aberto via briefing de eventos.', author: session.name }]
+      });
+      localStorage.setItem('sdr_tickets', JSON.stringify(tickets));
+    } catch(e) {}
   }
 
   document.getElementById('modalOverlay').addEventListener('click', function(e) {
