@@ -4,44 +4,13 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Criar Conta · Portal de Atendimento Rede D'Or</title>
+  <link rel="stylesheet" href="assets/css/shared.css" />
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    :root {
-      --bg: #0f1117; --surface: #1a1d27; --surface2: #22263a; --border: #2e3350;
-      --text: #e8eaf6; --muted: #8892b0;
-      --accent: #10b981; --accent-glow: rgba(16,185,129,0.25); --accent-bg: rgba(16,185,129,0.08);
-    }
     body {
       background: var(--bg); color: var(--text);
       font-family: 'Segoe UI', system-ui, sans-serif;
       min-height: 100vh; display: flex; flex-direction: column;
     }
-
-    /* NAV */
-    .main-nav {
-      position: sticky; top: 0; z-index: 200;
-      background: rgba(15,17,23,.92); backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--border);
-      display: flex; align-items: center; padding: 0 28px; height: 56px; gap: 8px;
-    }
-    .nav-brand {
-      font-size: .95rem; font-weight: 800; color: var(--text);
-      text-decoration: none; letter-spacing: -.01em; flex-shrink: 0;
-    }
-    .nav-brand span { color: var(--accent); }
-    .nav-links { display: flex; align-items: center; gap: 4px; margin-left: auto; }
-    .nav-link {
-      padding: 6px 14px; border-radius: 8px; font-size: .85rem; font-weight: 600;
-      color: var(--muted); text-decoration: none; transition: color .15s, background .15s;
-    }
-    .nav-link:hover { color: var(--text); background: var(--surface2); }
-    .nav-link.active { color: var(--accent); background: var(--accent-bg); }
-    .nav-btn {
-      padding: 7px 16px; border-radius: 8px; font-size: .85rem; font-weight: 700;
-      background: var(--accent); color: #fff; text-decoration: none; transition: filter .15s;
-      border: none; cursor: pointer; font-family: inherit;
-    }
-    .nav-btn:hover { filter: brightness(1.1); }
 
     /* MAIN CONTENT */
     .page-wrap {
@@ -132,14 +101,7 @@
 </head>
 <body>
 
-  <nav class="main-nav">
-    <a href="index.html" class="nav-brand">Rede D'Or <span>·</span> Briefings</a>
-    <div class="nav-links">
-      <a href="index.html" class="nav-link">Home</a>
-      <a href="login.html" class="nav-link">Login</a>
-      <a href="cadastro.html" class="nav-link active">Cadastro</a>
-    </div>
-  </nav>
+  <nav class="main-nav" id="mainNav"></nav>
 
   <div class="page-wrap">
     <div class="logo-area">
@@ -208,12 +170,13 @@
 
   <footer>&copy; 2026 Rede D'Or · Central de Atendimento</footer>
 
+<script src="assets/js/utils.js"></script>
+<script src="assets/js/seed.js"></script>
+<script src="assets/js/auth.js"></script>
+<script src="assets/js/nav.js"></script>
 <script>
-// Redirect if already logged in
-const existingSession = JSON.parse(localStorage.getItem('sdr_session') || 'null');
-if (existingSession && Date.now() < existingSession.expiresAt) {
-  window.location.href = existingSession.role === 'user' ? 'portal.html' : 'painel.html';
-}
+  redirectIfLoggedIn();
+  initNav('cadastro');
 
 // Password strength indicator
 document.getElementById('regPassword').addEventListener('input', function() {

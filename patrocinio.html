@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Briefing de Patrocínio · PAT</title>
+  <link rel="stylesheet" href="assets/css/shared.css" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
@@ -15,7 +16,7 @@
     body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; min-height: 100vh; }
 
     .topbar {
-      position: sticky; top: 0; z-index: 100;
+      position: sticky; top: var(--nav-h); z-index: 100;
       background: rgba(15,17,23,.85); backdrop-filter: blur(12px);
       border-bottom: 1px solid var(--border);
       display: flex; align-items: center; justify-content: space-between;
@@ -174,6 +175,8 @@
   </style>
 </head>
 <body>
+
+<nav class="main-nav" id="mainNav"></nav>
 
 <div class="topbar">
   <a href="index.html" class="back-btn">
@@ -674,5 +677,10 @@ Acompanhe sua solicitação com o protocolo: ${protocol}`;
     if (e.target === this) closePreview();
   });
 </script>
+<script src="assets/js/utils.js"></script>
+<script src="assets/js/seed.js"></script>
+<script src="assets/js/auth.js"></script>
+<script src="assets/js/nav.js"></script>
+<script>initNav('briefing');</script>
 </body>
 </html>

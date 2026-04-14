@@ -4,36 +4,18 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Meus Chamados · Portal Rede D'Or</title>
+  <link rel="stylesheet" href="assets/css/shared.css" />
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    :root {
-      --bg: #0f1117; --surface: #1a1d27; --surface2: #22263a; --border: #2e3350;
-      --text: #e8eaf6; --muted: #8892b0;
-      --accent: #a855f7; --accent-glow: rgba(168,85,247,0.3); --accent-bg: rgba(168,85,247,0.08);
-      --art: #a855f7; --art-bg: rgba(168,85,247,0.1);
-      --evt: #10b981; --evt-bg: rgba(16,185,129,0.1);
-      --pat: #f59e0b; --pat-bg: rgba(245,158,11,0.1);
-      --status-aberto: #3b82f6;
-      --status-andamento: #f59e0b;
-      --status-resolvido: #10b981;
-      --status-fechado: #8892b0;
-    }
     body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; min-height: 100vh; }
 
     /* TOPBAR */
     .topbar {
-      position: sticky; top: 0; z-index: 100;
+      position: sticky; top: var(--nav-h); z-index: 100;
       background: rgba(15,17,23,.9); backdrop-filter: blur(12px);
       border-bottom: 1px solid var(--border);
-      display: flex; align-items: center; gap: 16px;
-      padding: 12px 24px;
+      display: flex; align-items: center; gap: 16px; padding: 10px 24px;
     }
-    .back-btn {
-      display: flex; align-items: center; gap: 8px; color: var(--muted);
-      text-decoration: none; font-size: .88rem; transition: color .15s; flex-shrink: 0;
-    }
-    .back-btn:hover { color: var(--text); }
-    .search-wrap { flex: 1; max-width: 340px; position: relative; }
+    .search-wrap { flex: 1; max-width: 360px; position: relative; }
     .search-wrap svg { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--muted); pointer-events: none; }
     #searchInput {
       width: 100%; background: var(--surface2); border: 1px solid var(--border);
@@ -43,21 +25,6 @@
     }
     #searchInput:focus { border-color: var(--accent); }
     #searchInput::placeholder { color: var(--muted); opacity: .6; }
-    .topbar-right { display: flex; align-items: center; gap: 12px; margin-left: auto; }
-    .user-info { display: flex; align-items: center; gap: 10px; }
-    .avatar {
-      width: 34px; height: 34px; border-radius: 50%;
-      background: var(--accent-bg); border: 1px solid var(--accent);
-      display: flex; align-items: center; justify-content: center;
-      font-size: .78rem; font-weight: 700; color: var(--accent); flex-shrink: 0;
-    }
-    .user-name { font-size: .88rem; font-weight: 600; color: var(--text); }
-    .btn-logout {
-      background: none; border: none; color: var(--muted); cursor: pointer;
-      display: flex; align-items: center; padding: 6px; border-radius: 8px;
-      transition: color .15s, background .15s;
-    }
-    .btn-logout:hover { color: #ef4444; background: rgba(239,68,68,.08); }
 
     /* PAGE */
     .page { max-width: 800px; margin: 0 auto; padding: 32px 24px 80px; }
@@ -66,13 +33,11 @@
     .page-header p { color: var(--muted); font-size: .9rem; margin-top: 6px; }
 
     /* FILTER BAR */
-    .filter-bar {
-      display: flex; align-items: center; gap: 12px; margin-bottom: 24px; flex-wrap: wrap;
-    }
+    .filter-bar { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; flex-wrap: wrap; }
     .filter-label { font-size: .8rem; color: var(--muted); font-weight: 600; flex-shrink: 0; }
     .pills { display: flex; gap: 6px; flex-wrap: wrap; }
     .pill {
-      padding: 6px 14px; border-radius: 999px; border: 1px solid var(--border);
+      padding: 6px 14px; border-radius: var(--radius-full); border: 1px solid var(--border);
       background: var(--surface); color: var(--muted); font-size: .82rem; font-weight: 600;
       cursor: pointer; transition: all .15s; white-space: nowrap;
     }
@@ -81,7 +46,7 @@
     .sort-wrap { margin-left: auto; }
     .sort-wrap select {
       background: var(--surface); border: 1px solid var(--border);
-      border-radius: 8px; padding: 7px 12px; color: var(--text);
+      border-radius: var(--radius-sm); padding: 7px 12px; color: var(--text);
       font-size: .82rem; font-family: inherit; outline: none; cursor: pointer;
     }
     .sort-wrap select option { background: var(--surface2); }
@@ -90,7 +55,7 @@
     .tickets-list { display: flex; flex-direction: column; gap: 12px; }
     .ticket-card {
       background: var(--surface); border: 1px solid var(--border);
-      border-radius: 14px; padding: 20px; cursor: pointer;
+      border-radius: var(--radius-md); padding: 20px; cursor: pointer;
       transition: border-color .18s, box-shadow .18s, transform .18s;
     }
     .ticket-card:hover { transform: translateY(-2px); }
@@ -99,55 +64,24 @@
     .ticket-card.pat:hover { border-color: var(--pat); box-shadow: 0 8px 30px var(--pat-bg); }
 
     .card-top { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; flex-wrap: wrap; }
-    .protocol-id {
-      font-family: monospace; font-size: .88rem; font-weight: 700; letter-spacing: .04em;
-    }
+    .protocol-id { font-family: monospace; font-size: .88rem; font-weight: 700; letter-spacing: .04em; }
     .protocol-id.art { color: var(--art); }
     .protocol-id.evt { color: var(--evt); }
     .protocol-id.pat { color: var(--pat); }
-    .type-pill {
-      font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em;
-      padding: 3px 10px; border-radius: 999px;
-    }
-    .type-pill.art { background: var(--art-bg); color: var(--art); }
-    .type-pill.evt { background: var(--evt-bg); color: var(--evt); }
-    .type-pill.pat { background: var(--pat-bg); color: var(--pat); }
-    .status-badge {
-      font-size: .75rem; font-weight: 700; padding: 3px 10px; border-radius: 999px;
-    }
-    .status-badge.aberto { background: rgba(59,130,246,.12); color: var(--status-aberto); }
-    .status-badge.em_andamento { background: rgba(245,158,11,.12); color: var(--status-andamento); }
-    .status-badge.resolvido { background: rgba(16,185,129,.12); color: var(--status-resolvido); }
-    .status-badge.fechado { background: rgba(136,146,176,.12); color: var(--status-fechado); }
-    .priority-badge {
-      font-size: .72rem; font-weight: 700; padding: 3px 10px; border-radius: 999px; margin-left: auto;
-    }
-    .priority-badge.urgente { background: rgba(239,68,68,.12); color: #ef4444; }
-    .priority-badge.alto { background: rgba(245,158,11,.12); color: #f59e0b; }
-    .priority-badge.normal { background: rgba(136,146,176,.1); color: var(--muted); }
-
     .card-title { font-size: .97rem; font-weight: 600; margin-bottom: 10px; line-height: 1.4; }
     .card-meta { display: flex; gap: 20px; flex-wrap: wrap; }
     .meta-item { font-size: .8rem; color: var(--muted); }
     .meta-item span { color: var(--text); font-weight: 600; }
-    .sla-badge {
-      font-size: .72rem; font-weight: 700; padding: 2px 8px; border-radius: 999px; margin-left: auto;
-    }
-    .sla-badge.no_prazo { background: rgba(16,185,129,.1); color: #10b981; }
-    .sla-badge.urgencia { background: rgba(245,158,11,.1); color: #f59e0b; }
-    .sla-badge.atrasado { background: rgba(239,68,68,.1); color: #ef4444; }
 
     /* EMPTY STATE */
-    .empty-state {
-      text-align: center; padding: 80px 24px; color: var(--muted);
-    }
+    .empty-state { text-align: center; padding: 80px 24px; color: var(--muted); }
     .empty-state svg { color: var(--border); margin-bottom: 16px; }
     .empty-state h3 { font-size: 1.1rem; font-weight: 700; color: var(--text); margin-bottom: 8px; }
     .empty-state p { font-size: .9rem; }
 
     /* DETAIL OVERLAY */
     .overlay {
-      display: none; position: fixed; inset: 0; z-index: 200;
+      display: none; position: fixed; inset: 0; z-index: 600;
       background: rgba(0,0,0,.7); backdrop-filter: blur(4px);
       align-items: flex-start; justify-content: flex-end;
     }
@@ -155,8 +89,7 @@
     .detail-panel {
       width: min(560px, 100vw); height: 100vh; overflow-y: auto;
       background: var(--surface); border-left: 1px solid var(--border);
-      display: flex; flex-direction: column;
-      animation: slideIn .25s ease;
+      display: flex; flex-direction: column; animation: slideIn .25s ease;
     }
     @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
     .detail-header {
@@ -172,31 +105,22 @@
     }
     .btn-close:hover { color: var(--text); background: var(--surface2); }
     .detail-body { padding: 24px; flex: 1; }
-    .detail-info-grid {
-      display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 28px;
-    }
+    .detail-info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 28px; }
     .info-item { display: flex; flex-direction: column; gap: 4px; }
     .info-item .info-label { font-size: .75rem; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; font-weight: 600; }
     .info-item .info-value { font-size: .92rem; font-weight: 600; color: var(--text); }
-    .info-item .info-value.mono { font-family: monospace; }
     .section-title {
       font-size: .72rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
-      color: var(--accent); margin-bottom: 16px; padding-bottom: 8px;
-      border-bottom: 1px solid var(--border);
+      color: var(--accent); margin-bottom: 16px; padding-bottom: 8px; border-bottom: 1px solid var(--border);
     }
 
     /* TIMELINE */
-    .timeline { display: flex; flex-direction: column; gap: 0; }
-    .timeline-item { display: flex; gap: 16px; padding-bottom: 24px; position: relative; }
+    .timeline { display: flex; flex-direction: column; }
+    .timeline-item { display: flex; gap: 16px; padding-bottom: 24px; }
     .timeline-item:last-child { padding-bottom: 0; }
     .timeline-left { display: flex; flex-direction: column; align-items: center; flex-shrink: 0; }
-    .timeline-dot {
-      width: 10px; height: 10px; border-radius: 50%; border: 2px solid var(--accent);
-      background: var(--bg); flex-shrink: 0; margin-top: 4px;
-    }
-    .timeline-line {
-      width: 2px; background: var(--border); flex: 1; margin-top: 4px;
-    }
+    .timeline-dot { width: 10px; height: 10px; border-radius: 50%; border: 2px solid var(--accent); background: var(--bg); flex-shrink: 0; margin-top: 4px; }
+    .timeline-line { width: 2px; background: var(--border); flex: 1; margin-top: 4px; }
     .timeline-item:last-child .timeline-line { display: none; }
     .timeline-content { flex: 1; }
     .timeline-date { font-size: .77rem; color: var(--muted); margin-bottom: 4px; }
@@ -206,7 +130,6 @@
 
     @media (max-width: 580px) {
       .topbar { padding: 10px 16px; }
-      .user-name { display: none; }
       .search-wrap { max-width: none; flex: 1; }
       .filter-bar { gap: 8px; }
       .card-meta { gap: 12px; }
@@ -214,75 +137,17 @@
       .page { padding: 24px 16px 60px; }
     }
   </style>
-  <style>
-    /* Shared nav (matches index.html) */
-    .main-nav {
-      position: sticky; top: 0; z-index: 200;
-      background: rgba(15,17,23,.92); backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--border);
-      display: flex; align-items: center; padding: 0 28px; height: 56px; gap: 8px;
-    }
-    .nav-brand {
-      font-size: .95rem; font-weight: 800; color: var(--text);
-      text-decoration: none; letter-spacing: -.01em; flex-shrink: 0;
-    }
-    .nav-brand span { color: var(--accent); }
-    .nav-links-top { display: flex; align-items: center; gap: 4px; margin-left: auto; }
-    .nav-link-top {
-      padding: 6px 14px; border-radius: 8px; font-size: .85rem; font-weight: 600;
-      color: var(--muted); text-decoration: none; transition: color .15s, background .15s;
-    }
-    .nav-link-top:hover { color: var(--text); background: var(--surface2); }
-    .nav-link-top.active { color: var(--accent); background: var(--accent-bg); }
-    .nav-logout-btn {
-      background: none; border: none; color: var(--muted); cursor: pointer;
-      padding: 6px 14px; border-radius: 8px; font-size: .85rem; font-weight: 600;
-      font-family: inherit; transition: color .15s; display: flex; align-items: center; gap: 6px;
-    }
-    .nav-logout-btn:hover { color: #ef4444; }
-    /* Offset topbar so it appears below nav */
-    .topbar { top: 56px; }
-  </style>
 </head>
 <body>
 
-  <nav class="main-nav">
-    <a href="index.html" class="nav-brand">Rede D'Or <span>·</span> Briefings</a>
-    <div class="nav-links-top">
-      <a href="index.html" class="nav-link-top">Home</a>
-      <a href="portal.html" class="nav-link-top active">Meus Chamados</a>
-      <button class="nav-logout-btn" id="navLogoutTop">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/>
-        </svg>
-        Sair
-      </button>
-    </div>
-  </nav>
+  <nav class="main-nav" id="mainNav"></nav>
 
   <div class="topbar">
-    <a href="index.html" class="back-btn">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-        <path d="M19 12H5M12 19l-7-7 7-7"/>
-      </svg>
-      Início
-    </a>
     <div class="search-wrap">
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
         <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
       </svg>
       <input type="text" id="searchInput" placeholder="Buscar por protocolo (ART-...)" />
-    </div>
-    <div class="topbar-right">
-      <div class="user-info">
-        <div class="avatar" id="userAvatar">MS</div>
-        <span class="user-name" id="userName">Carregando...</span>
-      </div>
-      <button class="btn-logout" id="btnLogout" title="Sair">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/>
-        </svg>
-      </button>
     </div>
   </div>
 
@@ -319,7 +184,7 @@
     <div class="detail-panel" id="detailPanel">
       <div class="detail-header">
         <div>
-          <div id="detailProtocol" class="protocol-id" style="font-size:1rem; margin-bottom:4px;"></div>
+          <div id="detailProtocol" class="protocol-id" style="font-size:1rem;margin-bottom:4px;"></div>
           <h2 id="detailTitle"></h2>
         </div>
         <button class="btn-close" id="btnClose">
@@ -336,71 +201,21 @@
     </div>
   </div>
 
+<script src="assets/js/utils.js"></script>
+<script src="assets/js/seed.js"></script>
+<script src="assets/js/auth.js"></script>
+<script src="assets/js/nav.js"></script>
 <script>
-/* ─── AUTH GUARD ─────────────────────────────────────────────────────────── */
-const session = JSON.parse(localStorage.getItem('sdr_session') || 'null');
-if (!session || Date.now() > session.expiresAt) {
-  localStorage.removeItem('sdr_session');
-  window.location.href = 'login.html';
-}
-// Analysts and admins should use the analyst panel
-if (session && session.role !== 'user') {
-  window.location.href = 'painel.html';
-}
+/* ─── AUTH + NAV ──────────────────────────────────────────────────────────── */
+const session = guardAuth('user');
+initNav('portal');
 
-/* ─── HELPERS ────────────────────────────────────────────────────────────── */
-const users = JSON.parse(localStorage.getItem('sdr_users') || '[]');
-
-function userName(id) {
-  if (!id) return 'Não atribuído';
-  const u = users.find(u => u.id === id);
-  return u ? u.name : '—';
-}
-
-function fmtDate(iso) {
-  if (!iso) return '—';
-  return new Date(iso).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
-}
-
-function fmtDateTime(iso) {
-  if (!iso) return '—';
-  return new Date(iso).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
-}
-
-function statusLabel(s) {
-  return { aberto: 'Aberto', em_andamento: 'Em Andamento', resolvido: 'Resolvido', fechado: 'Fechado' }[s] || s;
-}
-
-function typeLabel(t) {
-  return { ART: '🎨 Criação', EVT: '🎪 Eventos', PAT: '🤝 Patrocínio' }[t] || t;
-}
-
-function priorityLabel(p) {
-  return { urgente: 'Urgente', alto: 'Alto', normal: 'Normal' }[p] || p;
-}
-
-function slaLabel(s) {
-  return { no_prazo: 'No Prazo', urgencia: 'Com Urgência', atrasado: 'Atrasado' }[s] || s;
-}
-
-const PRIORITY_ORDER = { urgente: 0, alto: 1, normal: 2 };
-
-/* ─── STATE ──────────────────────────────────────────────────────────────── */
+/* ─── STATE ───────────────────────────────────────────────────────────────── */
 let currentStatus = 'todos';
-let currentSort = 'createdAt_desc';
-let searchQuery = '';
+let currentSort   = 'createdAt_desc';
+let searchQuery   = '';
 
-/* ─── INIT ───────────────────────────────────────────────────────────────── */
-document.getElementById('userAvatar').textContent = session.initials || session.name.slice(0, 2).toUpperCase();
-document.getElementById('userName').textContent = session.name;
-
-function doLogout() {
-  localStorage.removeItem('sdr_session');
-  window.location.href = 'login.html';
-}
-document.getElementById('btnLogout').addEventListener('click', doLogout);
-document.getElementById('navLogoutTop').addEventListener('click', doLogout);
-
+/* ─── EVENTS ──────────────────────────────────────────────────────────────── */
 document.getElementById('searchInput').addEventListener('input', e => {
   searchQuery = e.target.value.trim().toUpperCase();
   render();
@@ -419,10 +234,9 @@ document.getElementById('sortSelect').addEventListener('change', e => {
   render();
 });
 
-/* ─── RENDER TICKETS ─────────────────────────────────────────────────────── */
-function getTickets() {
-  const all = JSON.parse(localStorage.getItem('sdr_tickets') || '[]');
-  return all.filter(t => t.userId === session.userId);
+/* ─── RENDER TICKETS ──────────────────────────────────────────────────────── */
+function getUserTickets() {
+  return getTickets().filter(t => t.userId === session.userId);
 }
 
 function sortTickets(tickets) {
@@ -436,15 +250,15 @@ function sortTickets(tickets) {
 }
 
 function render() {
-  let tickets = getTickets();
+  let tickets = getUserTickets();
+  const total = tickets.length;
 
   if (currentStatus !== 'todos') tickets = tickets.filter(t => t.status === currentStatus);
   if (searchQuery) tickets = tickets.filter(t => t.id.includes(searchQuery) || t.title.toUpperCase().includes(searchQuery));
   tickets = sortTickets(tickets);
 
-  const countEl = document.getElementById('ticketCount');
-  const total = getTickets().length;
-  countEl.textContent = `${total} chamado${total !== 1 ? 's' : ''} no total · exibindo ${tickets.length}`;
+  document.getElementById('ticketCount').textContent =
+    `${total} chamado${total !== 1 ? 's' : ''} no total · exibindo ${tickets.length}`;
 
   const list = document.getElementById('ticketsList');
 
@@ -483,10 +297,9 @@ function render() {
   });
 }
 
-/* ─── DETAIL PANEL ───────────────────────────────────────────────────────── */
+/* ─── DETAIL PANEL ────────────────────────────────────────────────────────── */
 function openDetail(id) {
-  const tickets = JSON.parse(localStorage.getItem('sdr_tickets') || '[]');
-  const t = tickets.find(x => x.id === id);
+  const t = getTickets().find(x => x.id === id);
   if (!t) return;
 
   const typeClass = t.type.toLowerCase();
@@ -495,42 +308,16 @@ function openDetail(id) {
   document.getElementById('detailTitle').textContent = t.title;
 
   document.getElementById('detailInfoGrid').innerHTML = `
-    <div class="info-item">
-      <span class="info-label">Tipo</span>
-      <span class="info-value">${typeLabel(t.type)}</span>
-    </div>
-    <div class="info-item">
-      <span class="info-label">Status</span>
-      <span class="info-value"><span class="status-badge ${t.status}">${statusLabel(t.status)}</span></span>
-    </div>
-    <div class="info-item">
-      <span class="info-label">Prioridade</span>
-      <span class="info-value"><span class="priority-badge ${t.priority}">${priorityLabel(t.priority)}</span></span>
-    </div>
-    <div class="info-item">
-      <span class="info-label">Analista Responsável</span>
-      <span class="info-value">${userName(t.analystId)}</span>
-    </div>
-    <div class="info-item">
-      <span class="info-label">Aberto em</span>
-      <span class="info-value">${fmtDateTime(t.createdAt)}</span>
-    </div>
-    <div class="info-item">
-      <span class="info-label">Última atualização</span>
-      <span class="info-value">${fmtDateTime(t.updatedAt)}</span>
-    </div>
-    ${t.deadline ? `<div class="info-item">
-      <span class="info-label">Prazo</span>
-      <span class="info-value">${fmtDate(t.deadline)}</span>
-    </div>` : ''}
-    ${t.resolvedAt ? `<div class="info-item">
-      <span class="info-label">Resolvido em</span>
-      <span class="info-value">${fmtDateTime(t.resolvedAt)}</span>
-    </div>
-    <div class="info-item">
-      <span class="info-label">SLA</span>
-      <span class="info-value"><span class="sla-badge ${t.slaStatus}">${slaLabel(t.slaStatus)}</span></span>
-    </div>` : ''}
+    <div class="info-item"><span class="info-label">Tipo</span><span class="info-value">${typeLabel(t.type)}</span></div>
+    <div class="info-item"><span class="info-label">Status</span><span class="info-value"><span class="status-badge ${t.status}">${statusLabel(t.status)}</span></span></div>
+    <div class="info-item"><span class="info-label">Prioridade</span><span class="info-value"><span class="priority-badge ${t.priority}">${priorityLabel(t.priority)}</span></span></div>
+    <div class="info-item"><span class="info-label">Analista</span><span class="info-value">${getUserName(t.analystId)}</span></div>
+    <div class="info-item"><span class="info-label">Aberto em</span><span class="info-value">${fmtDateTime(t.createdAt)}</span></div>
+    <div class="info-item"><span class="info-label">Última atualização</span><span class="info-value">${fmtDateTime(t.updatedAt)}</span></div>
+    ${t.deadline ? `<div class="info-item"><span class="info-label">Prazo</span><span class="info-value">${fmtDate(t.deadline)}</span></div>` : ''}
+    ${t.resolvedAt ? `
+    <div class="info-item"><span class="info-label">Resolvido em</span><span class="info-value">${fmtDateTime(t.resolvedAt)}</span></div>
+    <div class="info-item"><span class="info-label">SLA</span><span class="info-value"><span class="sla-badge ${t.slaStatus}">${slaLabel(t.slaStatus)}</span></span></div>` : ''}
   `;
 
   const history = [...(t.history || [])].reverse();

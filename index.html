@@ -4,171 +4,52 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Central de Briefings Marketing Rede D'Or</title>
+  <link rel="stylesheet" href="assets/css/shared.css" />
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     :root {
-      --bg: #0f1117;
-      --surface: #1a1d27;
-      --surface2: #22263a;
-      --border: #2e3350;
-      --text: #e8eaf6;
-      --muted: #8892b0;
-      --criacao: #a855f7;
-      --criacao-glow: rgba(168,85,247,0.25);
-      --eventos: #10b981;
-      --eventos-glow: rgba(16,185,129,0.25);
-      --patrocinio: #f59e0b;
-      --patrocinio-glow: rgba(245,158,11,0.25);
-      --accent: #a855f7;
-      --accent-bg: rgba(168,85,247,0.08);
+      --criacao:    #a855f7; --criacao-glow:   rgba(168,85,247,0.25);
+      --eventos:    #10b981; --eventos-glow:   rgba(16,185,129,0.25);
+      --patrocinio: #f59e0b; --patrocinio-glow:rgba(245,158,11,0.25);
     }
-
     body {
-      background: var(--bg);
-      color: var(--text);
+      background: var(--bg); color: var(--text);
       font-family: 'Segoe UI', system-ui, sans-serif;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
+      min-height: 100vh; display: flex; flex-direction: column;
     }
 
-    /* ── NAV ── */
-    .main-nav {
-      position: sticky; top: 0; z-index: 200;
-      background: rgba(15,17,23,.92); backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--border);
-      display: flex; align-items: center; padding: 0 28px; height: 56px; gap: 8px;
-    }
-    .nav-brand {
-      font-size: .95rem; font-weight: 800; color: var(--text);
-      text-decoration: none; letter-spacing: -.01em; flex-shrink: 0;
-    }
-    .nav-brand span { color: var(--accent); }
-    .nav-links { display: flex; align-items: center; gap: 4px; margin-left: auto; }
-    .nav-link {
-      padding: 6px 14px; border-radius: 8px; font-size: .85rem; font-weight: 600;
-      color: var(--muted); text-decoration: none; transition: color .15s, background .15s;
-    }
-    .nav-link:hover { color: var(--text); background: var(--surface2); }
-    .nav-link.active { color: var(--accent); background: var(--accent-bg); }
-
-    /* logged-in state (set by JS) */
-    .nav-logged .show-guest { display: none !important; }
-    .nav-logged .show-user  { display: flex !important; }
-    .show-user { display: none; align-items: center; gap: 8px; }
-
-    .nav-user-badge {
-      display: flex; align-items: center; gap: 8px;
-      padding: 4px 12px 4px 6px; border-radius: 999px;
-      background: var(--surface2); border: 1px solid var(--border);
-    }
-    .nav-avatar {
-      width: 26px; height: 26px; border-radius: 50%;
-      background: var(--accent-bg); border: 1px solid var(--accent);
-      display: flex; align-items: center; justify-content: center;
-      font-size: .68rem; font-weight: 700; color: var(--accent);
-    }
-    .nav-username { font-size: .83rem; font-weight: 600; color: var(--text); }
-    .nav-track-btn {
-      padding: 6px 14px; border-radius: 8px; font-size: .85rem; font-weight: 700;
-      background: var(--accent); color: #fff; text-decoration: none;
-      transition: filter .15s; white-space: nowrap;
-    }
-    .nav-track-btn:hover { filter: brightness(1.1); }
-    .nav-logout {
-      background: none; border: none; color: var(--muted); cursor: pointer;
-      padding: 6px; border-radius: 8px; transition: color .15s, background .15s;
-      display: flex; align-items: center; font-family: inherit;
-    }
-    .nav-logout:hover { color: #ef4444; background: rgba(239,68,68,.08); }
-
-    .nav-signup {
-      padding: 7px 16px; border-radius: 8px; font-size: .85rem; font-weight: 700;
-      background: var(--accent); color: #fff; text-decoration: none; transition: filter .15s;
-    }
-    .nav-signup:hover { filter: brightness(1.1); }
-
-    /* ── HEADER ── */
-    header {
-      text-align: center;
-      padding: 48px 24px 36px;
-    }
+    /* HEADER */
+    header { text-align: center; padding: 48px 24px 36px; }
     .badge {
-      display: inline-block;
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: 999px;
-      padding: 6px 16px;
-      font-size: 12px;
-      letter-spacing: .08em;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-bottom: 24px;
+      display: inline-block; background: var(--surface2); border: 1px solid var(--border);
+      border-radius: var(--radius-full); padding: 6px 16px;
+      font-size: 12px; letter-spacing: .08em; text-transform: uppercase;
+      color: var(--muted); margin-bottom: 24px;
     }
     header h1 {
-      font-size: clamp(2rem, 5vw, 3.2rem);
-      font-weight: 800;
-      letter-spacing: -.02em;
-      line-height: 1.1;
+      font-size: clamp(2rem, 5vw, 3.2rem); font-weight: 800; letter-spacing: -.02em; line-height: 1.1;
       background: linear-gradient(135deg, #e8eaf6 30%, #8892b0);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
     }
-    header p {
-      margin-top: 16px;
-      color: var(--muted);
-      font-size: 1.05rem;
-      max-width: 520px;
-      margin-inline: auto;
-      line-height: 1.6;
-    }
+    header p { margin-top: 16px; color: var(--muted); font-size: 1.05rem; max-width: 520px; margin-inline: auto; line-height: 1.6; }
 
-    /* ── CARDS ── */
-    main {
-      flex: 1;
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;
-      padding: 0 24px 80px;
-    }
-    .cards {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 24px;
-      width: 100%;
-      max-width: 960px;
-    }
+    /* CARDS */
+    main { flex: 1; display: flex; justify-content: center; align-items: flex-start; padding: 0 24px 80px; }
+    .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; width: 100%; max-width: 960px; }
     .card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 36px 32px;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-      text-decoration: none;
-      color: inherit;
+      background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg);
+      padding: 36px 32px; display: flex; flex-direction: column; gap: 16px;
+      text-decoration: none; color: inherit;
       transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease;
-      position: relative;
-      overflow: hidden;
     }
     .card:hover { transform: translateY(-6px); }
+    .card.criacao:hover    { border-color: var(--criacao);    box-shadow: 0 20px 60px var(--criacao-glow); }
+    .card.eventos:hover    { border-color: var(--eventos);    box-shadow: 0 20px 60px var(--eventos-glow); }
+    .card.patrocinio:hover { border-color: var(--patrocinio); box-shadow: 0 20px 60px var(--patrocinio-glow); }
 
-    .card.criacao:hover   { border-color: var(--criacao);   box-shadow: 0 20px 60px var(--criacao-glow); }
-    .card.eventos:hover   { border-color: var(--eventos);   box-shadow: 0 20px 60px var(--eventos-glow); }
-    .card.patrocinio:hover{ border-color: var(--patrocinio);box-shadow: 0 20px 60px var(--patrocinio-glow); }
-
-    .card-icon {
-      width: 52px; height: 52px;
-      border-radius: 14px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 24px;
-    }
+    .card-icon { width: 52px; height: 52px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 24px; }
     .criacao   .card-icon { background: rgba(168,85,247,.15); }
     .eventos   .card-icon { background: rgba(16,185,129,.15); }
-    .patrocinio .card-icon { background: rgba(245,158,11,.15); }
+    .patrocinio .card-icon{ background: rgba(245,158,11,.15); }
 
     .card h2 { font-size: 1.3rem; font-weight: 700; }
     .criacao   h2 { color: var(--criacao); }
@@ -178,72 +59,31 @@
     .card p { color: var(--muted); font-size: .93rem; line-height: 1.6; flex: 1; }
 
     .card-tag {
-      display: inline-block;
-      padding: 4px 10px;
-      border-radius: 999px;
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: .06em;
-      text-transform: uppercase;
-      width: fit-content;
+      display: inline-block; padding: 4px 10px; border-radius: var(--radius-full);
+      font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; width: fit-content;
     }
     .criacao   .card-tag { background: rgba(168,85,247,.12); color: var(--criacao); }
     .eventos   .card-tag { background: rgba(16,185,129,.12); color: var(--eventos); }
     .patrocinio .card-tag { background: rgba(245,158,11,.12); color: var(--patrocinio); }
 
-    .card-cta {
-      display: flex; align-items: center; gap: 8px;
-      font-size: .9rem; font-weight: 600; margin-top: 8px;
-    }
+    .card-cta { display: flex; align-items: center; gap: 8px; font-size: .9rem; font-weight: 600; margin-top: 8px; }
     .criacao   .card-cta { color: var(--criacao); }
     .eventos   .card-cta { color: var(--eventos); }
     .patrocinio .card-cta { color: var(--patrocinio); }
     .card-cta svg { transition: transform .18s ease; }
     .card:hover .card-cta svg { transform: translateX(4px); }
 
-    /* ── FOOTER ── */
-    footer {
-      text-align: center;
-      padding: 24px;
-      color: var(--muted);
-      font-size: .8rem;
-      border-top: 1px solid var(--border);
-    }
+    /* FOOTER */
+    footer { text-align: center; padding: 24px; color: var(--muted); font-size: .8rem; border-top: 1px solid var(--border); }
 
     @media (max-width: 600px) {
       .cards { grid-template-columns: 1fr; }
-      .main-nav { padding: 0 16px; }
-      .nav-username { display: none; }
     }
   </style>
 </head>
 <body>
 
-  <!-- NAV -->
-  <nav class="main-nav" id="mainNav">
-    <a href="index.html" class="nav-brand">Rede D'Or <span>·</span> Briefings</a>
-    <div class="nav-links">
-      <a href="index.html" class="nav-link active">Home</a>
-
-      <!-- Guest links -->
-      <a href="login.html"   class="nav-link show-guest">Login</a>
-      <a href="cadastro.html" class="nav-signup show-guest">Cadastro</a>
-
-      <!-- Logged-in links -->
-      <div class="show-user">
-        <div class="nav-user-badge">
-          <div class="nav-avatar" id="navAvatar"></div>
-          <span class="nav-username" id="navUsername"></span>
-        </div>
-        <a href="#" class="nav-track-btn" id="navTrackBtn">Acompanhar Chamados</a>
-        <button class="nav-logout" id="navLogout" title="Sair">
-          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/>
-          </svg>
-        </button>
-      </div>
-    </div>
-  </nav>
+  <nav class="main-nav" id="mainNav"></nav>
 
   <header>
     <div class="badge">Central de Briefings Marketing Rede D'Or</div>
@@ -300,23 +140,12 @@
     &copy; 2026 Marketing Briefings &mdash; Todos os protocolos são registrados e acompanhados pela equipe responsável.
   </footer>
 
+<script src="assets/js/utils.js"></script>
+<script src="assets/js/seed.js"></script>
+<script src="assets/js/auth.js"></script>
+<script src="assets/js/nav.js"></script>
 <script>
-const session = JSON.parse(localStorage.getItem('sdr_session') || 'null');
-const nav = document.getElementById('mainNav');
-
-if (session && Date.now() < session.expiresAt) {
-  nav.classList.add('nav-logged');
-  document.getElementById('navAvatar').textContent   = session.initials || session.name.slice(0,2).toUpperCase();
-  document.getElementById('navUsername').textContent = session.name;
-
-  const trackBtn = document.getElementById('navTrackBtn');
-  trackBtn.href = session.role === 'user' ? 'portal.html' : 'painel.html';
-
-  document.getElementById('navLogout').addEventListener('click', () => {
-    localStorage.removeItem('sdr_session');
-    window.location.reload();
-  });
-}
+  initNav('home');
 </script>
 </body>
 </html>

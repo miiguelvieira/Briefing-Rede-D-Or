@@ -3,58 +3,31 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Painel do Analista · Rede D'Or</title>
+  <title>Painel · Rede D'Or</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="assets/css/shared.css" />
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    :root {
-      --bg: #0f1117; --surface: #1a1d27; --surface2: #22263a; --border: #2e3350;
-      --text: #e8eaf6; --muted: #8892b0;
-      --accent: #a855f7; --accent-glow: rgba(168,85,247,0.3); --accent-bg: rgba(168,85,247,0.08);
-      --art: #a855f7; --art-bg: rgba(168,85,247,0.1);
-      --evt: #10b981; --evt-bg: rgba(16,185,129,0.1);
-      --pat: #f59e0b; --pat-bg: rgba(245,158,11,0.1);
-    }
     body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; min-height: 100vh; }
 
     /* TOPBAR */
     .topbar {
-      position: sticky; top: 0; z-index: 100;
+      position: sticky; top: var(--nav-h); z-index: 100;
       background: rgba(15,17,23,.9); backdrop-filter: blur(12px);
       border-bottom: 1px solid var(--border);
-      display: flex; align-items: center; gap: 16px; padding: 12px 24px;
+      display: flex; align-items: center; gap: 12px; padding: 10px 24px;
     }
-    .back-btn {
-      display: flex; align-items: center; gap: 8px; color: var(--muted);
-      text-decoration: none; font-size: .88rem; transition: color .15s; flex-shrink: 0;
-    }
-    .back-btn:hover { color: var(--text); }
     .topbar-title { font-weight: 700; font-size: .95rem; }
     .topbar-badge {
       background: var(--art-bg); border: 1px solid rgba(168,85,247,.25);
-      border-radius: 999px; padding: 3px 10px;
+      border-radius: var(--radius-full); padding: 3px 10px;
       font-size: .72rem; font-weight: 700; color: var(--art);
       text-transform: uppercase; letter-spacing: .06em;
     }
-    .topbar-right { display: flex; align-items: center; gap: 12px; margin-left: auto; }
-    .avatar {
-      width: 34px; height: 34px; border-radius: 50%;
-      background: var(--accent-bg); border: 1px solid var(--accent);
-      display: flex; align-items: center; justify-content: center;
-      font-size: .78rem; font-weight: 700; color: var(--accent); flex-shrink: 0;
-    }
-    .user-name { font-size: .88rem; font-weight: 600; }
-    .btn-logout {
-      background: none; border: none; color: var(--muted); cursor: pointer;
-      display: flex; align-items: center; padding: 6px; border-radius: 8px;
-      transition: color .15s, background .15s;
-    }
-    .btn-logout:hover { color: #ef4444; background: rgba(239,68,68,.08); }
 
     /* TABS */
     .tabs-bar {
-      display: flex; gap: 0; border-bottom: 1px solid var(--border);
-      padding: 0 24px; background: var(--bg);
+      display: flex; border-bottom: 1px solid var(--border);
+      padding: 0 24px; background: var(--bg); gap: 0;
     }
     .tab-btn {
       padding: 14px 24px; background: none; border: none; border-bottom: 2px solid transparent;
@@ -63,17 +36,17 @@
     }
     .tab-btn:hover { color: var(--text); }
     .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
 
     /* PAGE */
     .page { max-width: 1200px; margin: 0 auto; padding: 28px 24px 80px; }
 
     /* FILTER ROW */
-    .filter-row {
-      display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 20px;
-    }
+    .filter-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 20px; }
     .filter-group { display: flex; gap: 6px; flex-wrap: wrap; }
     .pill {
-      padding: 6px 14px; border-radius: 999px; border: 1px solid var(--border);
+      padding: 6px 14px; border-radius: var(--radius-full); border: 1px solid var(--border);
       background: var(--surface); color: var(--muted); font-size: .82rem; font-weight: 600;
       cursor: pointer; transition: all .15s; white-space: nowrap; font-family: inherit;
     }
@@ -84,13 +57,13 @@
     .pill.pat-pill.active { background: var(--pat-bg); border-color: var(--pat); color: var(--pat); }
     .filter-select {
       background: var(--surface); border: 1px solid var(--border);
-      border-radius: 8px; padding: 7px 12px; color: var(--text);
+      border-radius: var(--radius-sm); padding: 7px 12px; color: var(--text);
       font-size: .82rem; font-family: inherit; outline: none; cursor: pointer;
     }
     .filter-select option { background: var(--surface2); }
     .search-box {
       background: var(--surface); border: 1px solid var(--border);
-      border-radius: 8px; padding: 7px 12px; color: var(--text);
+      border-radius: var(--radius-sm); padding: 7px 12px; color: var(--text);
       font-size: .82rem; font-family: inherit; outline: none;
       transition: border-color .15s; width: 200px;
     }
@@ -99,15 +72,15 @@
     .filter-dates { display: flex; gap: 6px; align-items: center; }
     .filter-dates input[type="date"] {
       background: var(--surface); border: 1px solid var(--border);
-      border-radius: 8px; padding: 7px 10px; color: var(--text);
+      border-radius: var(--radius-sm); padding: 7px 10px; color: var(--text);
       font-size: .82rem; font-family: inherit; outline: none;
     }
     .filter-dates input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacity(.4); }
     .filter-dates span { color: var(--muted); font-size: .82rem; }
     .filter-count { margin-left: auto; color: var(--muted); font-size: .82rem; }
 
-    /* TICKETS TABLE */
-    .table-wrap { overflow-x: auto; border-radius: 14px; border: 1px solid var(--border); }
+    /* TABLE */
+    .table-wrap { overflow-x: auto; border-radius: var(--radius-md); border: 1px solid var(--border); }
     table { width: 100%; border-collapse: collapse; min-width: 800px; }
     thead { background: var(--surface2); }
     th {
@@ -125,30 +98,6 @@
     td.mono.art { color: var(--art); }
     td.mono.evt { color: var(--evt); }
     td.mono.pat { color: var(--pat); }
-    .type-pill {
-      font-size: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em;
-      padding: 3px 8px; border-radius: 999px;
-    }
-    .type-pill.art { background: var(--art-bg); color: var(--art); }
-    .type-pill.evt { background: var(--evt-bg); color: var(--evt); }
-    .type-pill.pat { background: var(--pat-bg); color: var(--pat); }
-    .status-badge {
-      font-size: .73rem; font-weight: 700; padding: 3px 9px; border-radius: 999px; white-space: nowrap;
-    }
-    .status-badge.aberto      { background: rgba(59,130,246,.12); color: #3b82f6; }
-    .status-badge.em_andamento{ background: rgba(245,158,11,.12);  color: #f59e0b; }
-    .status-badge.resolvido   { background: rgba(16,185,129,.12);  color: #10b981; }
-    .status-badge.fechado     { background: rgba(136,146,176,.12); color: #8892b0; }
-    .priority-badge {
-      font-size: .73rem; font-weight: 700; padding: 3px 9px; border-radius: 999px;
-    }
-    .priority-badge.urgente { background: rgba(239,68,68,.12);   color: #ef4444; }
-    .priority-badge.alto    { background: rgba(245,158,11,.12);  color: #f59e0b; }
-    .priority-badge.normal  { background: rgba(136,146,176,.1);  color: #8892b0; }
-    .sla-badge { font-size: .73rem; font-weight: 700; padding: 3px 8px; border-radius: 999px; }
-    .sla-badge.no_prazo { background: rgba(16,185,129,.1); color: #10b981; }
-    .sla-badge.urgencia { background: rgba(245,158,11,.1);  color: #f59e0b; }
-    .sla-badge.atrasado { background: rgba(239,68,68,.1);   color: #ef4444; }
     .td-actions { display: flex; gap: 6px; }
     .btn-icon {
       background: none; border: none; color: var(--muted); cursor: pointer;
@@ -159,14 +108,14 @@
 
     /* MODAL */
     .modal-overlay {
-      display: none; position: fixed; inset: 0; z-index: 200;
+      display: none; position: fixed; inset: 0; z-index: 700;
       background: rgba(0,0,0,.7); backdrop-filter: blur(4px);
       align-items: center; justify-content: center; padding: 24px;
     }
     .modal-overlay.open { display: flex; }
     .modal {
       background: var(--surface); border: 1px solid var(--border);
-      border-radius: 20px; padding: 32px; width: 100%; max-width: 480px;
+      border-radius: var(--radius-lg); padding: 32px; width: 100%; max-width: 480px;
       animation: fadeUp .22s ease;
     }
     @keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
@@ -198,22 +147,57 @@
     }
     .btn-save:hover { filter: brightness(1.1); }
 
-    /* REPORTS TAB */
+    /* REPORTS */
+    .report-toprow {
+      display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+      margin-bottom: 24px;
+    }
+    .period-filter { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .period-filter .pill { padding: 5px 12px; font-size: .8rem; }
+    .period-filter .filter-select { padding: 5px 10px; font-size: .8rem; }
+    .btn-export-wrap { position: relative; margin-left: auto; }
+    .btn-export {
+      display: flex; align-items: center; gap: 8px;
+      padding: 8px 16px; border-radius: var(--radius-sm);
+      background: var(--surface); border: 1px solid var(--border);
+      color: var(--text); font-size: .85rem; font-weight: 600;
+      font-family: inherit; cursor: pointer; transition: border-color .15s;
+      white-space: nowrap;
+    }
+    .btn-export:hover { border-color: var(--accent); }
+    .btn-export.open { border-color: var(--accent); }
+    .export-dropdown {
+      display: none; position: absolute; right: 0; top: calc(100% + 6px);
+      width: 220px; background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius-md); box-shadow: 0 16px 40px rgba(0,0,0,.4);
+      z-index: 600; overflow: hidden;
+    }
+    .export-dropdown.open { display: block; animation: dropIn .15s ease; }
+    .export-dropdown button {
+      display: flex; align-items: center; gap: 10px;
+      width: 100%; padding: 11px 16px; background: none; border: none;
+      color: var(--muted); font-size: .88rem; font-weight: 600;
+      font-family: inherit; cursor: pointer; text-align: left;
+      transition: background .12s, color .12s; border-top: 1px solid var(--border);
+    }
+    .export-dropdown button:first-child { border-top: none; }
+    .export-dropdown button:hover { background: var(--surface2); color: var(--text); }
+
     .summary-grid {
       display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
       gap: 16px; margin-bottom: 28px;
     }
     .summary-card {
       background: var(--surface); border: 1px solid var(--border);
-      border-radius: 14px; padding: 20px 22px;
+      border-radius: var(--radius-md); padding: 20px 22px;
     }
     .summary-card .s-label { font-size: .75rem; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; font-weight: 600; margin-bottom: 8px; }
     .summary-card .s-value { font-size: 2.2rem; font-weight: 800; letter-spacing: -.03em; }
     .summary-card .s-sub { font-size: .8rem; color: var(--muted); margin-top: 4px; }
-    .summary-card.accent-art .s-value { color: var(--art); }
-    .summary-card.accent-evt .s-value { color: var(--evt); }
-    .summary-card.accent-pat .s-value { color: var(--pat); }
-    .summary-card.accent-blue .s-value { color: #3b82f6; }
+    .summary-card.accent-art   .s-value { color: var(--art); }
+    .summary-card.accent-evt   .s-value { color: var(--evt); }
+    .summary-card.accent-pat   .s-value { color: var(--pat); }
+    .summary-card.accent-blue  .s-value { color: #3b82f6; }
     .summary-card.accent-green .s-value { color: #10b981; }
 
     .charts-grid {
@@ -223,58 +207,49 @@
       background: var(--surface); border: 1px solid var(--border);
       border-radius: 16px; padding: 22px;
     }
-    .chart-container h4 { font-size: .88rem; font-weight: 700; margin-bottom: 16px; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
+    .chart-container h4 {
+      font-size: .88rem; font-weight: 700; margin-bottom: 16px;
+      color: var(--muted); text-transform: uppercase; letter-spacing: .06em;
+    }
     .chart-container canvas { max-height: 260px; }
     .chart-full { grid-column: 1 / -1; }
 
-    /* WORKLOAD TABLE */
     .workload-card {
       background: var(--surface); border: 1px solid var(--border);
-      border-radius: 14px; overflow: hidden; margin-bottom: 28px;
+      border-radius: var(--radius-md); overflow: hidden; margin-bottom: 28px;
     }
-    .workload-card h4 { padding: 16px 20px; font-size: .88rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; border-bottom: 1px solid var(--border); }
+    .workload-card h4 {
+      padding: 16px 20px; font-size: .88rem; font-weight: 700;
+      color: var(--muted); text-transform: uppercase; letter-spacing: .06em;
+      border-bottom: 1px solid var(--border);
+    }
     .workload-table { width: 100%; border-collapse: collapse; }
     .workload-table th { padding: 10px 20px; text-align: left; font-size: .75rem; color: var(--muted); font-weight: 700; text-transform: uppercase; letter-spacing: .06em; }
     .workload-table td { padding: 12px 20px; font-size: .88rem; border-top: 1px solid var(--border); }
     .workload-bar { height: 6px; background: var(--border); border-radius: 3px; margin-top: 4px; }
     .workload-bar-fill { height: 100%; border-radius: 3px; background: var(--accent); }
 
-    /* HIDDEN */
-    .tab-content { display: none; }
-    .tab-content.active { display: block; }
-
     @media (max-width: 768px) {
       .charts-grid { grid-template-columns: 1fr; }
       .chart-full { grid-column: 1; }
-      .user-name { display: none; }
       .filter-dates { flex-wrap: wrap; }
       .page { padding: 20px 16px 60px; }
     }
     @media (max-width: 580px) {
       .filter-row { gap: 8px; }
       .summary-grid { grid-template-columns: repeat(2, 1fr); }
+      .report-toprow { gap: 8px; }
+      .btn-export-wrap { margin-left: 0; }
     }
   </style>
 </head>
 <body>
 
+  <nav class="main-nav" id="mainNav"></nav>
+
   <div class="topbar">
-    <a href="index.html" class="back-btn">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-        <path d="M19 12H5M12 19l-7-7 7-7"/>
-      </svg>
-    </a>
-    <span class="topbar-title">Painel do Analista</span>
-    <span class="topbar-badge">Analista</span>
-    <div class="topbar-right">
-      <div class="avatar" id="userAvatar">AS</div>
-      <span class="user-name" id="userName"></span>
-      <button class="btn-logout" id="btnLogout" title="Sair">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/>
-        </svg>
-      </button>
-    </div>
+    <span class="topbar-title" id="topbarTitle">Painel do Analista</span>
+    <span class="topbar-badge" id="topbarBadge">Analista</span>
   </div>
 
   <div class="tabs-bar">
@@ -338,23 +313,87 @@
   <div class="tab-content" id="tab-relatorios">
     <div class="page">
 
-      <div class="summary-grid" id="summaryGrid"></div>
-
-      <div class="charts-grid">
-        <div class="chart-container">
-          <h4>Distribuição por Tipo</h4>
-          <canvas id="chartTipo"></canvas>
+      <!-- Period filter + Export -->
+      <div class="report-toprow">
+        <div class="period-filter">
+          <button class="pill active" id="periodAllBtn">Todo o período</button>
+          <select class="filter-select" id="periodYear">
+            <option value="">Ano</option>
+          </select>
+          <select class="filter-select" id="periodMonth">
+            <option value="">Mês</option>
+            <option value="0">Janeiro</option>
+            <option value="1">Fevereiro</option>
+            <option value="2">Março</option>
+            <option value="3">Abril</option>
+            <option value="4">Maio</option>
+            <option value="5">Junho</option>
+            <option value="6">Julho</option>
+            <option value="7">Agosto</option>
+            <option value="8">Setembro</option>
+            <option value="9">Outubro</option>
+            <option value="10">Novembro</option>
+            <option value="11">Dezembro</option>
+          </select>
         </div>
-        <div class="chart-container">
-          <h4>Chamados por Status</h4>
-          <canvas id="chartStatus"></canvas>
-        </div>
-        <div class="chart-container chart-full">
-          <h4>SLA por Tipo de Chamado</h4>
-          <canvas id="chartSla"></canvas>
+        <div class="btn-export-wrap">
+          <button class="btn-export" id="btnExport">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/>
+            </svg>
+            Exportar
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M6 9l6 6 6-6"/>
+            </svg>
+          </button>
+          <div class="export-dropdown" id="exportDropdown">
+            <button data-action="csv">📊 Excel / CSV</button>
+            <button data-action="pdf">🖨️ PDF / Imprimir</button>
+            <button data-action="email">📧 Compartilhar por E-mail</button>
+          </div>
         </div>
       </div>
 
+      <!-- Summary cards (shared) -->
+      <div class="summary-grid" id="summaryGrid"></div>
+
+      <!-- ADMIN view: full multi-sector charts -->
+      <div id="adminCharts">
+        <div class="charts-grid">
+          <div class="chart-container">
+            <h4>Distribuição por Tipo</h4>
+            <canvas id="chartTipo"></canvas>
+          </div>
+          <div class="chart-container">
+            <h4>Chamados por Status</h4>
+            <canvas id="chartStatus"></canvas>
+          </div>
+          <div class="chart-container chart-full">
+            <h4>SLA por Tipo de Chamado</h4>
+            <canvas id="chartSla"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- ANALYST view: sector-specific charts -->
+      <div id="analystCharts" style="display:none">
+        <div class="charts-grid">
+          <div class="chart-container">
+            <h4>Chamados por Status</h4>
+            <canvas id="chartStatusA"></canvas>
+          </div>
+          <div class="chart-container">
+            <h4>Conformidade SLA</h4>
+            <canvas id="chartSlaA"></canvas>
+          </div>
+          <div class="chart-container chart-full">
+            <h4>Tendência Mensal (últimos 6 meses)</h4>
+            <canvas id="chartTrend"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Workload (shared) -->
       <div class="workload-card">
         <h4>Workload por Analista</h4>
         <table class="workload-table">
@@ -411,86 +450,40 @@
     </div>
   </div>
 
+<script src="assets/js/utils.js"></script>
+<script src="assets/js/seed.js"></script>
+<script src="assets/js/auth.js"></script>
+<script src="assets/js/nav.js"></script>
 <script>
-/* ─── AUTH GUARD ─────────────────────────────────────────────────────────── */
-const session = JSON.parse(localStorage.getItem('sdr_session') || 'null');
-if (!session || Date.now() > session.expiresAt) {
-  localStorage.removeItem('sdr_session');
-  window.location.href = 'login.html';
-}
-if (session && session.role === 'user') {
-  window.location.href = 'portal.html';
-}
+/* ─── AUTH + NAV ──────────────────────────────────────────────────────────── */
+const session = guardAuth('staff');
+initNav('painel');
 
-const isAdmin = session && session.role === 'admin';
-
-/* ─── HELPERS ────────────────────────────────────────────────────────────── */
-const allUsers = JSON.parse(localStorage.getItem('sdr_users') || '[]');
+const isAdmin = session.role === 'admin';
+const allUsers = getUsers();
 const analysts = allUsers.filter(u => u.role === 'analyst');
 
-function getTickets() { return JSON.parse(localStorage.getItem('sdr_tickets') || '[]'); }
-function saveTickets(t) { localStorage.setItem('sdr_tickets', JSON.stringify(t)); }
-
-// Tickets visible to the current user (admin = all, analyst = their sector only)
-function getScopedTickets() {
-  const all = getTickets();
-  if (isAdmin || !session.sector) return all;
-  return all.filter(t => t.type === session.sector);
-}
-
-function userName(id) {
-  if (!id) return 'Não atribuído';
-  const u = allUsers.find(u => u.id === id);
-  return u ? u.name : '—';
-}
-function fmtDate(iso) {
-  if (!iso) return '—';
-  return new Date(iso).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
-}
-function fmtDateTime(iso) {
-  if (!iso) return '—';
-  return new Date(iso).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
-}
-function statusLabel(s) {
-  return { aberto: 'Aberto', em_andamento: 'Em Andamento', resolvido: 'Resolvido', fechado: 'Fechado' }[s] || s;
-}
-function typeLabel(t) { return { ART: '🎨 Criação', EVT: '🎪 Eventos', PAT: '🤝 Patrocínio' }[t] || t; }
-
-const PRIORITY_ORDER = { urgente: 0, alto: 1, normal: 2 };
-
-/* ─── TOPBAR ─────────────────────────────────────────────────────────────── */
-document.getElementById('userAvatar').textContent = session.initials || session.name.slice(0, 2).toUpperCase();
-document.getElementById('userName').textContent = session.name;
-document.getElementById('btnLogout').addEventListener('click', () => {
-  localStorage.removeItem('sdr_session');
-  window.location.href = 'login.html';
-});
-
-// Set title and badge based on role/sector
-const topbarTitle = document.querySelector('.topbar-title');
-const topbarBadge = document.querySelector('.topbar-badge');
-const sectorMeta = { ART: { label: '🎨 Criação', color: '#a855f7', bg: 'rgba(168,85,247,0.1)', border: 'rgba(168,85,247,0.25)' }, EVT: { label: '🎪 Eventos', color: '#10b981', bg: 'rgba(16,185,129,0.1)', border: 'rgba(16,185,129,0.25)' }, PAT: { label: '🤝 Patrocínio', color: '#f59e0b', bg: 'rgba(245,158,11,0.1)', border: 'rgba(245,158,11,0.25)' } };
+/* ─── TOPBAR IDENTITY ─────────────────────────────────────────────────────── */
+const topbarTitle = document.getElementById('topbarTitle');
+const topbarBadge = document.getElementById('topbarBadge');
 
 if (isAdmin) {
   topbarTitle.textContent = 'Painel Administrativo';
   topbarBadge.textContent = '👑 Admin';
-  topbarBadge.style.cssText = 'background:rgba(245,158,11,0.12);border-color:rgba(245,158,11,0.3);color:#f59e0b';
-} else if (session.sector && sectorMeta[session.sector]) {
-  const m = sectorMeta[session.sector];
+  topbarBadge.style.cssText = 'background:rgba(245,158,11,.12);border-color:rgba(245,158,11,.3);color:#f59e0b';
+} else if (session.sector && SECTOR_META[session.sector]) {
+  const m = SECTOR_META[session.sector];
   topbarTitle.textContent = 'Painel Analista';
   topbarBadge.textContent = m.label;
   topbarBadge.style.cssText = `background:${m.bg};border-color:${m.border};color:${m.color}`;
 }
 
-// Hide type filter pills for non-admin analysts (they only see their own sector)
+// Hide type filter pills for non-admin analysts
 if (!isAdmin) {
-  const typeFilterEl = document.getElementById('typeFilter');
-  if (typeFilterEl) typeFilterEl.style.display = 'none';
+  document.getElementById('typeFilter').style.display = 'none';
 }
 
-/* ─── TABS ───────────────────────────────────────────────────────────────── */
-let chartsInitialized = false;
-
+/* ─── TABS ────────────────────────────────────────────────────────────────── */
 document.querySelectorAll('.tab-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -501,7 +494,7 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
   });
 });
 
-/* ─── TICKETS TABLE STATE ────────────────────────────────────────────────── */
+/* ─── TABLE STATE ─────────────────────────────────────────────────────────── */
 let filterType = 'todos';
 let filterStatus = 'todos';
 let filterAnalyst = 'todos';
@@ -511,7 +504,7 @@ let filterDateTo = '';
 let sortCol = 'priority';
 let sortDir = 'asc';
 
-/* ─── BUILD ANALYST FILTER ───────────────────────────────────────────────── */
+/* ─── POPULATE SELECTS ────────────────────────────────────────────────────── */
 const analystSel = document.getElementById('analystFilter');
 analysts.forEach(a => {
   const opt = document.createElement('option');
@@ -520,7 +513,6 @@ analysts.forEach(a => {
   analystSel.appendChild(opt);
 });
 
-/* ─── EDIT ANALYST SELECT ────────────────────────────────────────────────── */
 const editAnalystSel = document.getElementById('editAnalyst');
 const optNone = document.createElement('option');
 optNone.value = ''; optNone.textContent = 'Não atribuído';
@@ -532,7 +524,7 @@ analysts.forEach(a => {
   editAnalystSel.appendChild(opt);
 });
 
-/* ─── FILTER EVENTS ──────────────────────────────────────────────────────── */
+/* ─── FILTER EVENTS ───────────────────────────────────────────────────────── */
 document.getElementById('typeFilter').addEventListener('click', e => {
   if (!e.target.classList.contains('pill')) return;
   document.querySelectorAll('#typeFilter .pill').forEach(p => p.classList.remove('active'));
@@ -540,7 +532,6 @@ document.getElementById('typeFilter').addEventListener('click', e => {
   filterType = e.target.dataset.type;
   renderTable();
 });
-
 document.getElementById('statusFilter').addEventListener('click', e => {
   if (!e.target.classList.contains('pill')) return;
   document.querySelectorAll('#statusFilter .pill').forEach(p => p.classList.remove('active'));
@@ -548,13 +539,12 @@ document.getElementById('statusFilter').addEventListener('click', e => {
   filterStatus = e.target.dataset.status;
   renderTable();
 });
-
 analystSel.addEventListener('change', e => { filterAnalyst = e.target.value; renderTable(); });
 document.getElementById('tableSearch').addEventListener('input', e => { filterSearch = e.target.value.trim().toUpperCase(); renderTable(); });
 document.getElementById('dateFrom').addEventListener('change', e => { filterDateFrom = e.target.value; renderTable(); });
 document.getElementById('dateTo').addEventListener('change', e => { filterDateTo = e.target.value; renderTable(); });
 
-/* ─── SORT ───────────────────────────────────────────────────────────────── */
+/* ─── TABLE SORT ──────────────────────────────────────────────────────────── */
 document.querySelectorAll('th[data-col]').forEach(th => {
   th.addEventListener('click', () => {
     const col = th.dataset.col;
@@ -567,10 +557,9 @@ document.querySelectorAll('th[data-col]').forEach(th => {
   });
 });
 
-/* ─── RENDER TABLE ───────────────────────────────────────────────────────── */
+/* ─── RENDER TABLE ────────────────────────────────────────────────────────── */
 function applyFilters(tickets) {
   return tickets.filter(t => {
-    // Type filter only available for admin
     if (isAdmin && filterType !== 'todos' && t.type !== filterType) return false;
     if (filterStatus !== 'todos' && t.status !== filterStatus) return false;
     if (filterAnalyst !== 'todos' && String(t.analystId) !== String(filterAnalyst)) return false;
@@ -585,8 +574,8 @@ function sortTickets(tickets) {
   return [...tickets].sort((a, b) => {
     let va = a[sortCol], vb = b[sortCol];
     if (sortCol === 'priority') { va = PRIORITY_ORDER[a.priority] ?? 3; vb = PRIORITY_ORDER[b.priority] ?? 3; }
-    if (va === null || va === undefined) va = '';
-    if (vb === null || vb === undefined) vb = '';
+    if (va == null) va = '';
+    if (vb == null) vb = '';
     if (va < vb) return sortDir === 'asc' ? -1 : 1;
     if (va > vb) return sortDir === 'asc' ? 1 : -1;
     return 0;
@@ -594,7 +583,7 @@ function sortTickets(tickets) {
 }
 
 function renderTable() {
-  const base = getScopedTickets();
+  const base = getScopedTickets(session);
   const filtered = applyFilters(base);
   const sorted = sortTickets(filtered);
 
@@ -602,7 +591,7 @@ function renderTable() {
 
   const body = document.getElementById('ticketsBody');
   if (sorted.length === 0) {
-    body.innerHTML = `<tr><td colspan="11" style="text-align:center;color:var(--muted);padding:40px;">Nenhum chamado corresponde aos filtros selecionados.</td></tr>`;
+    body.innerHTML = `<tr><td colspan="11" style="text-align:center;color:var(--muted);padding:40px;">Nenhum chamado corresponde aos filtros.</td></tr>`;
     return;
   }
 
@@ -613,13 +602,13 @@ function renderTable() {
       <td class="mono ${tc}">${t.id}</td>
       <td><span class="type-pill ${tc}">${t.type}</span></td>
       <td style="max-width:200px;white-space:normal;">${t.title}</td>
-      <td><span class="priority-badge ${t.priority}">${{urgente:'Urgente',alto:'Alto',normal:'Normal'}[t.priority]}</span></td>
+      <td><span class="priority-badge ${t.priority}">${priorityLabel(t.priority)}</span></td>
       <td><span class="status-badge ${t.status}">${statusLabel(t.status)}</span></td>
-      <td style="color:var(--muted)">${userName(t.userId)}</td>
-      <td style="color:var(--muted)">${userName(t.analystId)}</td>
+      <td style="color:var(--muted)">${getUserName(t.userId)}</td>
+      <td style="color:var(--muted)">${getUserName(t.analystId)}</td>
       <td style="color:var(--muted);white-space:nowrap">${fmtDate(t.createdAt)}</td>
       <td style="color:var(--muted);white-space:nowrap">${fmtDate(t.deadline)}</td>
-      <td>${t.resolvedAt ? `<span class="sla-badge ${t.slaStatus}">${{no_prazo:'No Prazo',urgencia:'Urgência',atrasado:'Atrasado'}[t.slaStatus]}</span>` : '—'}</td>
+      <td>${t.resolvedAt ? `<span class="sla-badge ${t.slaStatus}">${slaLabel(t.slaStatus)}</span>` : '—'}</td>
       <td>
         <div class="td-actions">
           <button class="btn-icon" data-edit="${t.id}" title="Editar">
@@ -638,7 +627,7 @@ function renderTable() {
   });
 }
 
-/* ─── EDIT MODAL ─────────────────────────────────────────────────────────── */
+/* ─── EDIT MODAL ──────────────────────────────────────────────────────────── */
 let editingId = null;
 
 function openEditModal(id) {
@@ -668,17 +657,14 @@ document.getElementById('editModal').addEventListener('click', e => {
 
 document.getElementById('btnSaveEdit').addEventListener('click', () => {
   if (!editingId) return;
-  const newStatus = document.getElementById('editStatus').value;
+  const newStatus   = document.getElementById('editStatus').value;
   const newPriority = document.getElementById('editPriority').value;
-  const newAnalyst = document.getElementById('editAnalyst').value;
-  const note = document.getElementById('editNote').value.trim();
+  const newAnalyst  = document.getElementById('editAnalyst').value;
+  const note        = document.getElementById('editNote').value.trim();
 
-  if (!note) {
-    document.getElementById('editNote').style.borderColor = '#ef4444';
-    document.getElementById('editNote').focus();
-    return;
-  }
-  document.getElementById('editNote').style.borderColor = '';
+  const noteEl = document.getElementById('editNote');
+  if (!note) { noteEl.style.borderColor = '#ef4444'; noteEl.focus(); return; }
+  noteEl.style.borderColor = '';
 
   const tickets = getTickets();
   const idx = tickets.findIndex(t => t.id === editingId);
@@ -686,56 +672,130 @@ document.getElementById('btnSaveEdit').addEventListener('click', () => {
 
   const now = new Date().toISOString();
   const t = tickets[idx];
-  const prevStatus = t.status;
-
-  t.status = newStatus;
-  t.priority = newPriority;
+  t.status    = newStatus;
+  t.priority  = newPriority;
   t.analystId = newAnalyst ? parseInt(newAnalyst) : null;
   t.updatedAt = now;
 
   if ((newStatus === 'resolvido' || newStatus === 'fechado') && !t.resolvedAt) {
     t.resolvedAt = now;
-    const deadline = t.deadline ? new Date(t.deadline) : null;
-    if (deadline && new Date(now) > deadline) {
-      t.slaStatus = 'atrasado';
-    } else if (t.priority === 'urgente') {
-      t.slaStatus = 'urgencia';
-    } else {
-      t.slaStatus = 'no_prazo';
-    }
+    t.slaStatus  = computeSlaStatus(t);
   }
 
-  const historyEntry = {
-    date: now,
-    status: newStatus,
-    note: note,
-    author: session.name
-  };
-  t.history = [...(t.history || []), historyEntry];
+  t.history = [...(t.history || []), { date: now, status: newStatus, note, author: session.name }];
   tickets[idx] = t;
   saveTickets(tickets);
-
   closeEditModal();
   renderTable();
 });
 
-/* ─── REPORTS ────────────────────────────────────────────────────────────── */
+/* ─── PERIOD FILTER ───────────────────────────────────────────────────────── */
+let reportPeriod = { type: 'all', month: null, year: null };
+
+function populateYearSelect() {
+  const yearSel = document.getElementById('periodYear');
+  const years = getTicketYears(getScopedTickets(session));
+  years.forEach(y => {
+    const opt = document.createElement('option');
+    opt.value = y; opt.textContent = y;
+    yearSel.appendChild(opt);
+  });
+}
+populateYearSelect();
+
+document.getElementById('periodAllBtn').addEventListener('click', () => {
+  reportPeriod = { type: 'all', month: null, year: null };
+  document.getElementById('periodYear').value = '';
+  document.getElementById('periodMonth').value = '';
+  document.getElementById('periodAllBtn').classList.add('active');
+  renderReports();
+});
+
+document.getElementById('periodYear').addEventListener('change', e => {
+  const y = e.target.value ? parseInt(e.target.value) : null;
+  reportPeriod = { type: y ? 'month' : 'all', year: y, month: null };
+  document.getElementById('periodMonth').value = '';
+  document.getElementById('periodAllBtn').classList.toggle('active', !y);
+  renderReports();
+});
+
+document.getElementById('periodMonth').addEventListener('change', e => {
+  const m = e.target.value !== '' ? parseInt(e.target.value) : null;
+  reportPeriod.month = m;
+  reportPeriod.type = (reportPeriod.year || m !== null) ? 'month' : 'all';
+  document.getElementById('periodAllBtn').classList.toggle('active', reportPeriod.type === 'all');
+  renderReports();
+});
+
+/* ─── EXPORT ──────────────────────────────────────────────────────────────── */
+const btnExport      = document.getElementById('btnExport');
+const exportDropdown = document.getElementById('exportDropdown');
+
+btnExport.addEventListener('click', e => {
+  e.stopPropagation();
+  const open = exportDropdown.classList.toggle('open');
+  btnExport.classList.toggle('open', open);
+});
+document.addEventListener('click', () => {
+  exportDropdown.classList.remove('open');
+  btnExport.classList.remove('open');
+});
+
+exportDropdown.querySelectorAll('button[data-action]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const tickets = filterByPeriod(getScopedTickets(session), reportPeriod);
+    const sectorLabel = session.sector ? SECTOR_META[session.sector]?.label : null;
+    const periodLabel = _getPeriodLabel();
+
+    if (btn.dataset.action === 'csv') {
+      exportToCSV(tickets, `relatorio_${session.sector || 'geral'}`);
+    } else if (btn.dataset.action === 'pdf') {
+      window.print();
+    } else if (btn.dataset.action === 'email') {
+      shareByEmail(tickets, periodLabel, sectorLabel);
+    }
+    exportDropdown.classList.remove('open');
+    btnExport.classList.remove('open');
+  });
+});
+
+function _getPeriodLabel() {
+  if (reportPeriod.type === 'all') return 'Todo o período';
+  const months = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+  if (reportPeriod.month !== null && reportPeriod.year) {
+    return `${months[reportPeriod.month]}/${reportPeriod.year}`;
+  }
+  if (reportPeriod.year) return String(reportPeriod.year);
+  return 'Período selecionado';
+}
+
+/* ─── REPORTS ─────────────────────────────────────────────────────────────── */
 let chartTipo = null, chartStatus = null, chartSla = null;
+let chartStatusA = null, chartSlaA = null, chartTrend = null;
+
+function destroyCharts() {
+  [chartTipo, chartStatus, chartSla, chartStatusA, chartSlaA, chartTrend].forEach(c => { if (c) c.destroy(); });
+  chartTipo = chartStatus = chartSla = chartStatusA = chartSlaA = chartTrend = null;
+}
 
 function renderReports() {
-  const tickets = getScopedTickets();
-  const total = tickets.length;
-  const abertos = tickets.filter(t => t.status === 'aberto').length;
-  const resolvidos = tickets.filter(t => t.status === 'resolvido' || t.status === 'fechado').length;
-  const resolved = tickets.filter(t => t.resolvedAt);
-  const noPrazo = resolved.filter(t => t.slaStatus === 'no_prazo').length;
-  const slaPct = resolved.length ? Math.round((noPrazo / resolved.length) * 100) : 0;
+  const base    = getScopedTickets(session);
+  const tickets = filterByPeriod(base, reportPeriod);
 
+  const total     = tickets.length;
+  const abertos   = tickets.filter(t => t.status === 'aberto').length;
+  const resolvidos= tickets.filter(t => t.status === 'resolvido' || t.status === 'fechado').length;
+  const resolved  = tickets.filter(t => t.resolvedAt);
+  const noPrazo   = resolved.filter(t => t.slaStatus === 'no_prazo').length;
+  const slaPct    = resolved.length ? Math.round((noPrazo / resolved.length) * 100) : 0;
+
+  // Summary cards
+  const sectorAccent = session.sector ? `accent-${session.sector.toLowerCase()}` : '';
   document.getElementById('summaryGrid').innerHTML = `
     <div class="summary-card">
       <div class="s-label">Total de Chamados</div>
       <div class="s-value" style="color:var(--text)">${total}</div>
-      <div class="s-sub">desde o início</div>
+      <div class="s-sub">${_getPeriodLabel()}</div>
     </div>
     <div class="summary-card accent-blue">
       <div class="s-label">Abertos</div>
@@ -754,134 +814,141 @@ function renderReports() {
     </div>
   `;
 
-  // Count by type
-  const artCount = tickets.filter(t => t.type === 'ART').length;
-  const evtCount = tickets.filter(t => t.type === 'EVT').length;
-  const patCount = tickets.filter(t => t.type === 'PAT').length;
-
-  // Count by status
-  const stAberto = tickets.filter(t => t.status === 'aberto').length;
-  const stAndamento = tickets.filter(t => t.status === 'em_andamento').length;
-  const stResolvido = tickets.filter(t => t.status === 'resolvido').length;
-  const stFechado = tickets.filter(t => t.status === 'fechado').length;
-
-  // SLA by type
-  function slaByType(type, slaStatus) {
-    return tickets.filter(t => t.type === type && t.slaStatus === slaStatus).length;
-  }
-
   Chart.defaults.color = '#8892b0';
   Chart.defaults.font.family = "'Segoe UI', system-ui, sans-serif";
   Chart.defaults.borderColor = '#2e3350';
 
-  if (chartTipo) chartTipo.destroy();
-  if (chartStatus) chartStatus.destroy();
-  if (chartSla) chartSla.destroy();
+  destroyCharts();
+
+  if (isAdmin) {
+    document.getElementById('adminCharts').style.display = '';
+    document.getElementById('analystCharts').style.display = 'none';
+    _renderAdminCharts(tickets);
+  } else {
+    document.getElementById('adminCharts').style.display = 'none';
+    document.getElementById('analystCharts').style.display = '';
+    _renderAnalystCharts(tickets, base);
+  }
+
+  // Workload
+  const workloadAnalysts = isAdmin ? analysts : analysts.filter(a => a.id === session.userId);
+  const wTickets = getScopedTickets(session); // workload always on all-time data
+  const maxOpen  = Math.max(...workloadAnalysts.map(a => wTickets.filter(t => t.analystId === a.id && (t.status === 'aberto' || t.status === 'em_andamento')).length), 1);
+
+  document.getElementById('workloadBody').innerHTML = workloadAnalysts.map(a => {
+    const mine     = wTickets.filter(t => t.analystId === a.id);
+    const myOpen   = mine.filter(t => t.status === 'aberto').length;
+    const myOngoing= mine.filter(t => t.status === 'em_andamento').length;
+    const myActive = myOpen + myOngoing;
+    const pct      = Math.round((myActive / maxOpen) * 100);
+    return `<tr>
+      <td><strong>${a.name}</strong><br><span style="font-size:.78rem;color:var(--muted)">${a.department}</span></td>
+      <td>${myOpen}</td>
+      <td>${myOngoing}</td>
+      <td><strong>${myActive}</strong></td>
+      <td style="min-width:120px">
+        <div class="workload-bar"><div class="workload-bar-fill" style="width:${pct}%"></div></div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function _renderAdminCharts(tickets) {
+  const artC = tickets.filter(t => t.type === 'ART').length;
+  const evtC = tickets.filter(t => t.type === 'EVT').length;
+  const patC = tickets.filter(t => t.type === 'PAT').length;
+  const stA  = tickets.filter(t => t.status === 'aberto').length;
+  const stAn = tickets.filter(t => t.status === 'em_andamento').length;
+  const stR  = tickets.filter(t => t.status === 'resolvido').length;
+  const stF  = tickets.filter(t => t.status === 'fechado').length;
+
+  const slaByType = (type, sla) => tickets.filter(t => t.type === type && t.slaStatus === sla).length;
 
   chartTipo = new Chart(document.getElementById('chartTipo'), {
     type: 'doughnut',
     data: {
       labels: ['ART – Criação', 'EVT – Eventos', 'PAT – Patrocínio'],
-      datasets: [{
-        data: [artCount, evtCount, patCount],
-        backgroundColor: ['#a855f7', '#10b981', '#f59e0b'],
-        borderColor: '#1a1d27',
-        borderWidth: 3,
-        hoverOffset: 10
-      }]
+      datasets: [{ data: [artC, evtC, patC], backgroundColor: ['#a855f7','#10b981','#f59e0b'], borderColor: '#1a1d27', borderWidth: 3, hoverOffset: 10 }]
     },
-    options: {
-      responsive: true,
-      cutout: '65%',
-      plugins: {
-        legend: { position: 'bottom', labels: { color: '#e8eaf6', padding: 16, font: { size: 12 } } },
-        tooltip: { callbacks: { label: ctx => ` ${ctx.label}: ${ctx.parsed} chamados` } }
-      }
-    }
+    options: { responsive: true, cutout: '65%', plugins: { legend: { position: 'bottom', labels: { color: '#e8eaf6', padding: 16, font: { size: 12 } } } } }
   });
 
   chartStatus = new Chart(document.getElementById('chartStatus'), {
     type: 'bar',
     data: {
-      labels: ['Aberto', 'Em Andamento', 'Resolvido', 'Fechado'],
-      datasets: [{
-        label: 'Chamados',
-        data: [stAberto, stAndamento, stResolvido, stFechado],
-        backgroundColor: ['#3b82f6', '#f59e0b', '#10b981', '#8892b0'],
-        borderRadius: 8,
-        borderSkipped: false
-      }]
+      labels: ['Aberto','Em Andamento','Resolvido','Fechado'],
+      datasets: [{ label: 'Chamados', data: [stA,stAn,stR,stF], backgroundColor: ['#3b82f6','#f59e0b','#10b981','#8892b0'], borderRadius: 8, borderSkipped: false }]
     },
-    options: {
-      responsive: true,
-      plugins: { legend: { display: false } },
-      scales: {
-        x: { ticks: { color: '#8892b0' }, grid: { color: '#2e3350' } },
-        y: { ticks: { color: '#8892b0', stepSize: 1 }, grid: { color: '#2e3350' }, beginAtZero: true }
-      }
-    }
+    options: { responsive: true, plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#8892b0' }, grid: { color: '#2e3350' } }, y: { ticks: { color: '#8892b0', stepSize: 1 }, grid: { color: '#2e3350' }, beginAtZero: true } } }
   });
 
   chartSla = new Chart(document.getElementById('chartSla'), {
     type: 'bar',
     data: {
-      labels: ['ART – Criação', 'EVT – Eventos', 'PAT – Patrocínio'],
+      labels: ['ART – Criação','EVT – Eventos','PAT – Patrocínio'],
       datasets: [
-        {
-          label: 'No Prazo',
-          data: [slaByType('ART','no_prazo'), slaByType('EVT','no_prazo'), slaByType('PAT','no_prazo')],
-          backgroundColor: '#10b981', borderRadius: 4
-        },
-        {
-          label: 'Com Urgência',
-          data: [slaByType('ART','urgencia'), slaByType('EVT','urgencia'), slaByType('PAT','urgencia')],
-          backgroundColor: '#f59e0b'
-        },
-        {
-          label: 'Atrasado',
-          data: [slaByType('ART','atrasado'), slaByType('EVT','atrasado'), slaByType('PAT','atrasado')],
-          backgroundColor: '#ef4444'
-        }
+        { label: 'No Prazo',     data: [slaByType('ART','no_prazo'),slaByType('EVT','no_prazo'),slaByType('PAT','no_prazo')], backgroundColor: '#10b981', borderRadius: 4 },
+        { label: 'Com Urgência', data: [slaByType('ART','urgencia'),slaByType('EVT','urgencia'),slaByType('PAT','urgencia')], backgroundColor: '#f59e0b' },
+        { label: 'Atrasado',     data: [slaByType('ART','atrasado'),slaByType('EVT','atrasado'),slaByType('PAT','atrasado')], backgroundColor: '#ef4444' }
+      ]
+    },
+    options: { responsive: true, plugins: { legend: { labels: { color: '#e8eaf6', font: { size: 12 } } } }, scales: { x: { stacked: true, ticks: { color: '#8892b0' }, grid: { color: '#2e3350' } }, y: { stacked: true, ticks: { color: '#8892b0', stepSize: 1 }, grid: { color: '#2e3350' }, beginAtZero: true } } }
+  });
+}
+
+function _renderAnalystCharts(tickets, allScopedTickets) {
+  const sectorColor = session.sector ? SECTOR_META[session.sector]?.color || '#a855f7' : '#a855f7';
+
+  const stA  = tickets.filter(t => t.status === 'aberto').length;
+  const stAn = tickets.filter(t => t.status === 'em_andamento').length;
+  const stR  = tickets.filter(t => t.status === 'resolvido').length;
+  const stF  = tickets.filter(t => t.status === 'fechado').length;
+
+  const noPrazo = tickets.filter(t => t.slaStatus === 'no_prazo').length;
+  const urgencia= tickets.filter(t => t.slaStatus === 'urgencia').length;
+  const atrasado= tickets.filter(t => t.slaStatus === 'atrasado').length;
+
+  chartStatusA = new Chart(document.getElementById('chartStatusA'), {
+    type: 'bar',
+    data: {
+      labels: ['Aberto','Em Andamento','Resolvido','Fechado'],
+      datasets: [{ label: 'Chamados', data: [stA,stAn,stR,stF], backgroundColor: ['#3b82f6','#f59e0b','#10b981','#8892b0'], borderRadius: 8, borderSkipped: false }]
+    },
+    options: { responsive: true, plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#8892b0' }, grid: { color: '#2e3350' } }, y: { ticks: { color: '#8892b0', stepSize: 1 }, grid: { color: '#2e3350' }, beginAtZero: true } } }
+  });
+
+  chartSlaA = new Chart(document.getElementById('chartSlaA'), {
+    type: 'doughnut',
+    data: {
+      labels: ['No Prazo','Com Urgência','Atrasado'],
+      datasets: [{ data: [noPrazo, urgencia, atrasado], backgroundColor: ['#10b981','#f59e0b','#ef4444'], borderColor: '#1a1d27', borderWidth: 3, hoverOffset: 10 }]
+    },
+    options: { responsive: true, cutout: '60%', plugins: { legend: { position: 'bottom', labels: { color: '#e8eaf6', padding: 14, font: { size: 12 } } } } }
+  });
+
+  // Monthly trend using all-time scoped data (not period-filtered)
+  const monthly = getMonthlyBreakdown(allScopedTickets, 6);
+  chartTrend = new Chart(document.getElementById('chartTrend'), {
+    type: 'bar',
+    data: {
+      labels: monthly.map(m => m.label),
+      datasets: [
+        { label: 'Total',     data: monthly.map(m => m.total),     backgroundColor: sectorColor + '33', borderColor: sectorColor, borderWidth: 2, borderRadius: 6 },
+        { label: 'Resolvidos',data: monthly.map(m => m.resolvido), backgroundColor: '#10b981',          borderRadius: 6 }
       ]
     },
     options: {
       responsive: true,
       plugins: { legend: { labels: { color: '#e8eaf6', font: { size: 12 } } } },
       scales: {
-        x: { stacked: true, ticks: { color: '#8892b0' }, grid: { color: '#2e3350' } },
-        y: { stacked: true, ticks: { color: '#8892b0', stepSize: 1 }, grid: { color: '#2e3350' }, beginAtZero: true }
+        x: { ticks: { color: '#8892b0' }, grid: { color: '#2e3350' } },
+        y: { ticks: { color: '#8892b0', stepSize: 1 }, grid: { color: '#2e3350' }, beginAtZero: true }
       }
     }
   });
-
-  // Workload — admin sees all analysts; analyst sees only themselves
-  const workloadAnalysts = isAdmin ? analysts : analysts.filter(a => a.id === session.userId);
-  const maxOpen = Math.max(...workloadAnalysts.map(a => tickets.filter(t => t.analystId === a.id && (t.status === 'aberto' || t.status === 'em_andamento')).length), 1);
-
-  document.getElementById('workloadBody').innerHTML = workloadAnalysts.map(a => {
-    const myTickets = tickets.filter(t => t.analystId === a.id);
-    const myAbertos  = myTickets.filter(t => t.status === 'aberto').length;
-    const myAndamento = myTickets.filter(t => t.status === 'em_andamento').length;
-    const myAtivo = myAbertos + myAndamento;
-    const pct = Math.round((myAtivo / maxOpen) * 100);
-    return `
-      <tr>
-        <td><strong>${a.name}</strong><br><span style="font-size:.78rem;color:var(--muted)">${a.department}</span></td>
-        <td>${myAbertos}</td>
-        <td>${myAndamento}</td>
-        <td><strong>${myAtivo}</strong></td>
-        <td style="min-width:120px">
-          <div class="workload-bar">
-            <div class="workload-bar-fill" style="width:${pct}%"></div>
-          </div>
-        </td>
-      </tr>`;
-  }).join('');
-
-  chartsInitialized = true;
 }
 
-/* ─── INIT ───────────────────────────────────────────────────────────────── */
+/* ─── INIT ────────────────────────────────────────────────────────────────── */
 renderTable();
 </script>
 </body>
