@@ -689,30 +689,30 @@ Acompanhe sua solicitação com o protocolo: ${protocol}`;
     setTimeout(() => t.classList.remove('show'), 3000);
   }
 
-  function persistTicketIfLoggedIn() {
+  async function persistTicketIfLoggedIn() {
     try {
-      const raw = localStorage.getItem('sdr_session');
-      if (!raw) return;
-      const session = JSON.parse(raw);
-      if (Date.now() > session.expiresAt) return;
-      const tickets = JSON.parse(localStorage.getItem('sdr_tickets') || '[]');
-      if (tickets.find(t => t.id === protocol)) return;
+      const session = await window._authReady;
+      if (!session) return;
+      // Avoid duplicates
+      const existing = await db.collection('tickets').doc(protocol).get();
+      if (existing.exists) return;
       const prioridadeMap = { 'Normal': 'normal', 'Alta': 'alto', 'Urgente': 'urgente' };
-      const now = new Date().toISOString();
+      const nowIso = new Date().toISOString();
       const prazoVal = val('prazo');
-      tickets.push({
-        id: protocol, type: 'ART',
+      const prioEl = document.getElementById('prioridade');
+      const prioText = prioEl ? prioEl.options[prioEl.selectedIndex]?.text : '';
+      await db.collection('tickets').doc(protocol).set({
+        type: 'ART',
         title: val('projeto') || 'Briefing de Criação',
         status: 'aberto',
-        priority: prioridadeMap[document.getElementById('prioridade')?.options[document.getElementById('prioridade').selectedIndex]?.text] || 'normal',
+        priority: prioridadeMap[prioText] || 'normal',
         userId: session.userId, analystId: null,
-        createdAt: now, updatedAt: now,
+        createdAt: nowIso, updatedAt: nowIso,
         deadline: prazoVal ? new Date(prazoVal).toISOString() : null,
         resolvedAt: null, slaStatus: 'no_prazo',
-        history: [{ date: now, status: 'aberto', note: 'Ticket aberto via briefing de criação.', author: session.name }]
+        history: [{ date: nowIso, status: 'aberto', note: 'Ticket aberto via briefing de criação.', author: session.name }],
       });
-      localStorage.setItem('sdr_tickets', JSON.stringify(tickets));
-    } catch(e) {}
+    } catch(e) { console.error('Persist ticket error:', e); }
   }
 
   // Close modal clicking overlay
@@ -720,10 +720,14 @@ Acompanhe sua solicitação com o protocolo: ${protocol}`;
     if (e.target === this) closePreview();
   });
 </script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+<script src="assets/js/firebase-config.js"></script>
 <script src="assets/js/utils.js"></script>
 <script src="assets/js/seed.js"></script>
 <script src="assets/js/auth.js"></script>
 <script src="assets/js/nav.js"></script>
-<script>initNav('briefing');</script>
+<script>window._authReady.then(() => initNav('briefing'));</script>
 </body>
 </html>

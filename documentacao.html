@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Documentação · Portal de Atendimento Marketing · Rede D'Or</title>
+  <link rel="stylesheet" href="assets/css/shared.css" />
+  <style>
+    body {
+      background: var(--bg); color: var(--text);
+      font-family: 'Segoe UI', system-ui, sans-serif; min-height: 100vh;
+    }
+    .doc-wrap { max-width: 900px; margin: 0 auto; padding: 48px 24px 100px; }
+
+    /* COVER */
+    .cover {
+      text-align: center; padding: 60px 32px 48px;
+      border: 1px solid var(--border); border-radius: var(--radius-lg);
+      background: var(--surface); margin-bottom: 48px;
+      background: linear-gradient(160deg, var(--surface) 60%, rgba(168,85,247,.06));
+    }
+    .cover-badge {
+      display: inline-block; background: var(--accent-bg); border: 1px solid rgba(168,85,247,.25);
+      border-radius: var(--radius-full); padding: 6px 18px; font-size: .75rem; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--accent); font-weight: 700; margin-bottom: 24px;
+    }
+    .cover h1 {
+      font-size: clamp(1.8rem, 4vw, 2.8rem); font-weight: 800; letter-spacing: -.02em; line-height: 1.2;
+      background: linear-gradient(135deg, #e8eaf6 30%, #8892b0);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+      margin-bottom: 16px;
+    }
+    .cover p { color: var(--muted); font-size: 1rem; max-width: 520px; margin: 0 auto 24px; line-height: 1.7; }
+    .cover-meta {
+      display: flex; justify-content: center; gap: 32px; flex-wrap: wrap;
+      font-size: .82rem; color: var(--muted);
+    }
+    .cover-meta span strong { color: var(--text); }
+
+    /* SECTION */
+    .section { margin-bottom: 48px; }
+    .section-title {
+      font-size: 1.15rem; font-weight: 800; color: var(--text);
+      display: flex; align-items: center; gap: 10px;
+      padding-bottom: 12px; border-bottom: 1px solid var(--border); margin-bottom: 24px;
+    }
+    .section-icon {
+      width: 36px; height: 36px; border-radius: 10px;
+      background: var(--accent-bg); display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem; flex-shrink: 0;
+    }
+    .section p { color: var(--muted); line-height: 1.8; margin-bottom: 12px; }
+    .section p:last-child { margin-bottom: 0; }
+    .section strong { color: var(--text); }
+
+    /* INFO CARDS GRID */
+    .cards-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+    .info-card {
+      background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md);
+      padding: 20px 22px;
+    }
+    .info-card .ic-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+    .info-card .ic-icon { font-size: 1.4rem; }
+    .info-card .ic-title { font-weight: 700; font-size: .95rem; }
+    .info-card p { color: var(--muted); font-size: .87rem; line-height: 1.6; }
+
+    /* PROFILES TABLE */
+    .profiles-table { width: 100%; border-collapse: collapse; }
+    .profiles-table th {
+      text-align: left; padding: 10px 14px; font-size: .75rem; font-weight: 700;
+      color: var(--muted); text-transform: uppercase; letter-spacing: .06em;
+      background: var(--surface2); border-bottom: 1px solid var(--border);
+    }
+    .profiles-table td { padding: 12px 14px; font-size: .88rem; border-bottom: 1px solid var(--border); vertical-align: top; }
+    .profiles-table tr:last-child td { border-bottom: none; }
+    .profiles-table td ul { margin: 0; padding-left: 16px; color: var(--muted); }
+    .profiles-table td ul li { margin-bottom: 4px; }
+    .profiles-wrap { border: 1px solid var(--border); border-radius: var(--radius-md); overflow: hidden; }
+
+    /* ROLE BADGE */
+    .role-b { display: inline-block; padding: 3px 10px; border-radius: var(--radius-full); font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; white-space: nowrap; }
+    .role-b.admin    { background: rgba(245,158,11,.12); border: 1px solid rgba(245,158,11,.3); color: #f59e0b; }
+    .role-b.analyst  { background: var(--accent-bg); border: 1px solid rgba(168,85,247,.25); color: var(--accent); }
+    .role-b.user     { background: rgba(16,185,129,.1); border: 1px solid rgba(16,185,129,.25); color: #10b981; }
+
+    /* FLOW DIAGRAM */
+    .flow { display: flex; align-items: center; flex-wrap: wrap; gap: 0; margin: 20px 0; }
+    .flow-step {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+      padding: 14px 18px; font-size: .85rem; text-align: center; min-width: 110px;
+    }
+    .flow-step .fs-icon { font-size: 1.4rem; display: block; margin-bottom: 4px; }
+    .flow-step .fs-label { color: var(--text); font-weight: 700; font-size: .82rem; }
+    .flow-step .fs-sub { color: var(--muted); font-size: .72rem; }
+    .flow-arrow { color: var(--accent); font-size: 1.2rem; padding: 0 6px; }
+    .status-flow { display: flex; align-items: center; gap: 0; flex-wrap: wrap; margin: 16px 0; }
+    .sf-step {
+      padding: 8px 16px; border-radius: var(--radius-full); font-size: .82rem; font-weight: 700;
+      border: 1px solid;
+    }
+    .sf-step.aberto { background: rgba(59,130,246,.1); border-color: rgba(59,130,246,.3); color: #3b82f6; }
+    .sf-step.em_andamento { background: rgba(245,158,11,.1); border-color: rgba(245,158,11,.3); color: #f59e0b; }
+    .sf-step.resolvido { background: rgba(16,185,129,.1); border-color: rgba(16,185,129,.3); color: #10b981; }
+    .sf-step.fechado { background: var(--surface2); border-color: var(--border); color: var(--muted); }
+
+    /* TECH STACK */
+    .tech-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; }
+    .tech-item {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+      padding: 14px 16px; display: flex; align-items: center; gap: 12px;
+    }
+    .tech-icon { font-size: 1.5rem; flex-shrink: 0; }
+    .tech-name { font-weight: 700; font-size: .88rem; }
+    .tech-desc { color: var(--muted); font-size: .75rem; }
+
+    /* SECURITY */
+    .security-list { list-style: none; padding: 0; margin: 0; }
+    .security-list li {
+      display: flex; align-items: flex-start; gap: 10px;
+      padding: 10px 0; border-bottom: 1px solid var(--border); font-size: .88rem;
+    }
+    .security-list li:last-child { border-bottom: none; }
+    .sec-icon { font-size: 1rem; flex-shrink: 0; margin-top: 1px; }
+    .sec-text { color: var(--muted); line-height: 1.6; }
+    .sec-text strong { color: var(--text); }
+
+    /* NEXT STEPS */
+    .roadmap { display: flex; flex-direction: column; gap: 12px; }
+    .roadmap-item {
+      display: flex; align-items: flex-start; gap: 14px;
+      background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+      padding: 14px 16px;
+    }
+    .roadmap-num {
+      background: var(--accent-bg); border: 1px solid rgba(168,85,247,.25); color: var(--accent);
+      border-radius: 50%; width: 28px; height: 28px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .8rem; font-weight: 800;
+    }
+    .roadmap-content .rt { font-weight: 700; font-size: .9rem; }
+    .roadmap-content .rs { color: var(--muted); font-size: .82rem; margin-top: 2px; }
+
+    /* PRINT */
+    @media print {
+      body { background: #fff; color: #111; }
+      .main-nav, .print-hide { display: none !important; }
+      .doc-wrap { padding: 20px; }
+      .cover { background: #f9f9f9 !important; border-color: #ccc; }
+      .section { page-break-inside: avoid; }
+      a { color: inherit; text-decoration: none; }
+    }
+
+    @media (max-width: 600px) {
+      .flow { gap: 6px; }
+      .flow-arrow { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <nav class="main-nav" id="mainNav"></nav>
+
+  <div class="doc-wrap">
+
+    <!-- COVER -->
+    <div class="cover">
+      <div class="cover-badge">Rede D'Or São Luiz · Marketing</div>
+      <h1>Portal de Atendimento<br>Marketing</h1>
+      <p>Sistema centralizado de gestão de briefings e chamados para as equipes de Criação, Eventos e Patrocínio da Rede D'Or.</p>
+      <div class="cover-meta">
+        <span><strong>Versão</strong> 1.0</span>
+        <span><strong>Área</strong> Marketing &amp; Comunicação</span>
+        <span><strong>Ano</strong> 2026</span>
+        <span><strong>Classificação</strong> Interno</span>
+      </div>
+    </div>
+
+    <!-- 1. VISÃO GERAL -->
+    <div class="section">
+      <div class="section-title">
+        <div class="section-icon">🎯</div>
+        1. Visão Geral
+      </div>
+      <p>O <strong>Portal de Atendimento Marketing</strong> é uma plataforma digital interna desenvolvida para centralizar, organizar e acompanhar todas as solicitações de serviços das equipes de marketing da Rede D'Or. Anteriormente geridas por e-mail e planilhas, as demandas agora possuem rastreabilidade completa, com protocolo único, histórico de alterações e indicadores de desempenho.</p>
+      <p>O sistema contempla três áreas de serviço: <strong>Criação (ART)</strong> — materiais gráficos e comunicação visual; <strong>Eventos (EVT)</strong> — planejamento e produção de eventos institucionais; e <strong>Patrocínio (PAT)</strong> — aprovação e gestão de patrocínios estratégicos.</p>
+    </div>
+
+    <!-- 2. OBJETIVOS -->
+    <div class="section">
+      <div class="section-title">
+        <div class="section-icon">✅</div>
+        2. Objetivos
+      </div>
+      <div class="cards-grid">
+        <div class="info-card">
+          <div class="ic-header"><span class="ic-icon">📋</span><span class="ic-title">Centralização</span></div>
+          <p>Unificar todas as solicitações de marketing em um único canal, eliminando a dispersão por e-mail e mensagens instantâneas.</p>
+        </div>
+        <div class="info-card">
+          <div class="ic-header"><span class="ic-icon">🔍</span><span class="ic-title">Rastreabilidade</span></div>
+          <p>Cada chamado recebe um protocolo único e mantém histórico completo de ações, responsáveis e notas de atualização.</p>
+        </div>
+        <div class="info-card">
+          <div class="ic-header"><span class="ic-icon">⏱</span><span class="ic-title">SLA e Prazos</span></div>
+          <p>Monitoramento automático de prazos com indicadores de conformidade (no prazo, urgência, atrasado).</p>
+        </div>
+        <div class="info-card">
+          <div class="ic-header"><span class="ic-icon">📊</span><span class="ic-title">Visibilidade</span></div>
+          <p>Dashboards e relatórios gerenciais em tempo real, com exportação para CSV e compartilhamento por e-mail.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. PERFIS DE ACESSO -->
+    <div class="section">
+      <div class="section-title">
+        <div class="section-icon">👥</div>
+        3. Perfis de Acesso
+      </div>
+      <div class="profiles-wrap">
+        <table class="profiles-table">
+          <thead>
+            <tr>
+              <th>Perfil</th>
+              <th>Descrição</th>
+              <th>Permissões</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="role-b admin">👑 Admin</span></td>
+              <td style="color:var(--muted)">Gerente de Marketing ou responsável pelo sistema</td>
+              <td>
+                <ul>
+                  <li>Visualizar todos os chamados de todos os setores</li>
+                  <li>Editar, reatribuir e fechar qualquer chamado</li>
+                  <li>Acessar relatórios consolidados</li>
+                  <li>Gerenciar contas de usuários</li>
+                  <li>Exportar dados (CSV, PDF)</li>
+                </ul>
+              </td>
+            </tr>
+            <tr>
+              <td><span class="role-b analyst">Analista</span></td>
+              <td style="color:var(--muted)">Responsável por um setor (ART, EVT ou PAT)</td>
+              <td>
+                <ul>
+                  <li>Visualizar chamados do seu setor</li>
+                  <li>Atualizar status, prioridade e responsável</li>
+                  <li>Adicionar notas e observações</li>
+                  <li>Acessar relatórios do seu setor</li>
+                  <li>Criar sub-demandas ao reatribuir chamados</li>
+                </ul>
+              </td>
+            </tr>
+            <tr>
+              <td><span class="role-b user">Usuário</span></td>
+              <td style="color:var(--muted)">Solicitante — qualquer colaborador da Rede D'Or</td>
+              <td>
+                <ul>
+                  <li>Criar briefings de Criação, Eventos ou Patrocínio</li>
+                  <li>Acompanhar seus próprios chamados no portal</li>
+                  <li>Visualizar histórico e status em tempo real</li>
+                </ul>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 4. FLUXO DE CHAMADOS -->
+    <div class="section">
+      <div class="section-title">
+        <div class="section-icon">🔄</div>
+        4. Fluxo de Chamados
+      </div>
+      <p><strong>Jornada do solicitante:</strong></p>
+      <div class="flow">
+        <div class="flow-step">
+          <span class="fs-icon">🔐</span>
+          <span class="fs-label">Login</span>
+          <span class="fs-sub">Acesso com e-mail corporativo</span>
+        </div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-step">
+          <span class="fs-icon">📝</span>
+          <span class="fs-label">Briefing</span>
+          <span class="fs-sub">Preenche formulário</span>
+        </div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-step">
+          <span class="fs-icon">🎫</span>
+          <span class="fs-label">Protocolo</span>
+          <span class="fs-sub">Chamado criado (ART/EVT/PAT)</span>
+        </div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-step">
+          <span class="fs-icon">📡</span>
+          <span class="fs-label">Acompanhe</span>
+          <span class="fs-sub">Histórico no portal</span>
+        </div>
+      </div>
+
+      <p style="margin-top:20px"><strong>Ciclo de vida do chamado:</strong></p>
+      <div class="status-flow">
+        <div class="sf-step aberto">Aberto</div>
+        <span class="flow-arrow">→</span>
+        <div class="sf-step em_andamento">Em Andamento</div>
+        <span class="flow-arrow">→</span>
+        <div class="sf-step resolvido">Resolvido</div>
+        <span class="flow-arrow">→</span>
+        <div class="sf-step fechado">Fechado</div>
+      </div>
+
+      <p style="margin-top:20px">Quando um analista reatribui um chamado a outro responsável, o sistema cria automaticamente uma <strong>sub-demanda vinculada</strong> ao chamado original — mantendo toda a rastreabilidade da solução em um único protocolo.</p>
+    </div>
+
+    <!-- 5. MÓDULOS DO SISTEMA -->
+    <div class="section">
+      <div class="section-title">
+        <div class="section-icon">🗂</div>
+        5. Módulos do Sistema
+      </div>
+      <div class="cards-grid">
+        <div class="info-card">
+          <div class="ic-header"><span class="ic-icon">📋</span><span class="ic-title">Portal do Usuário</span></div>
+          <p>Consulta de chamados pessoais com busca, filtros por status/tipo e visualização do histórico de atualizações.</p>
+        </div>
+        <div class="info-card">
+          <div class="ic-header"><span class="ic-icon">🖥</span><span class="ic-title">Painel Analista</span></div>
+          <p>Gestão completa dos chamados do setor: edição de status, prioridade, responsável e adição de notas.</p>
+        </div>
+        <div class="info-card">
+          <div class="ic-header"><span class="ic-icon">📊</span><span class="ic-title">Relatórios</span></div>
+          <p>Gráficos de distribuição, conformidade de SLA, tendência mensal e workload por analista, com filtros de período.</p>
+        </div>
+        <div class="info-card">
+          <div class="ic-header"><span class="ic-icon">👥</span><span class="ic-title">Gestão de Usuários</span></div>
+          <p>Painel administrativo com lista de todas as contas cadastradas, perfis, setores e controle de ativação.</p>
+        </div>
+        <div class="info-card">
+          <div class="ic-header"><span class="ic-icon">🔑</span><span class="ic-title">Recuperação de Senha</span></div>
+          <p>Fluxo de 3 etapas: e-mail → código de verificação (6 dígitos) → nova senha, com expiração de 15 minutos.</p>
+        </div>
+        <div class="info-card">
+          <div class="ic-header"><span class="ic-icon">✅</span><span class="ic-title">Confirmação de Edição</span></div>
+          <p>Modal de revisão mostrando todas as alterações antes de salvar, evitando mudanças acidentais em chamados.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6. TECNOLOGIAS -->
+    <div class="section">
+      <div class="section-title">
+        <div class="section-icon">⚙️</div>
+        6. Tecnologias e Infraestrutura
+      </div>
+      <div class="tech-grid">
+        <div class="tech-item">
+          <span class="tech-icon">🌐</span>
+          <div><div class="tech-name">HTML5 + CSS3</div><div class="tech-desc">Interface responsiva</div></div>
+        </div>
+        <div class="tech-item">
+          <span class="tech-icon">⚡</span>
+          <div><div class="tech-name">JavaScript ES6+</div><div class="tech-desc">Lógica de negócio</div></div>
+        </div>
+        <div class="tech-item">
+          <span class="tech-icon">🔥</span>
+          <div><div class="tech-name">Firebase</div><div class="tech-desc">Auth + Firestore (produção)</div></div>
+        </div>
+        <div class="tech-item">
+          <span class="tech-icon">📊</span>
+          <div><div class="tech-name">Chart.js</div><div class="tech-desc">Gráficos e dashboards</div></div>
+        </div>
+        <div class="tech-item">
+          <span class="tech-icon">📧</span>
+          <div><div class="tech-name">EmailJS</div><div class="tech-desc">Recuperação de senha</div></div>
+        </div>
+        <div class="tech-item">
+          <span class="tech-icon">🎨</span>
+          <div><div class="tech-name">Design System</div><div class="tech-desc">Tokens CSS compartilhados</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 7. SEGURANÇA -->
+    <div class="section">
+      <div class="section-title">
+        <div class="section-icon">🔒</div>
+        7. Segurança e Controle de Acesso
+      </div>
+      <ul class="security-list">
+        <li>
+          <span class="sec-icon">🔐</span>
+          <span class="sec-text"><strong>Autenticação Firebase:</strong> Em produção, a autenticação é gerenciada pelo Firebase Authentication, com suporte a e-mail/senha, MFA e gerenciamento seguro de sessões pelo Google.</span>
+        </li>
+        <li>
+          <span class="sec-icon">📋</span>
+          <span class="sec-text"><strong>Regras Firestore:</strong> O banco de dados possui regras de segurança server-side que impedem qualquer acesso não autorizado diretamente no banco — independente do que o frontend faça.</span>
+        </li>
+        <li>
+          <span class="sec-icon">👁</span>
+          <span class="sec-text"><strong>Controle por perfil:</strong> Cada perfil (Admin, Analista, Usuário) possui acesso restrito às funcionalidades e dados pertinentes à sua função, validado tanto no frontend quanto nas regras do Firestore.</span>
+        </li>
+        <li>
+          <span class="sec-icon">📧</span>
+          <span class="sec-text"><strong>Recuperação de senha segura:</strong> Código de 6 dígitos enviado por e-mail com expiração de 15 minutos — o token é invalidado após o uso.</span>
+        </li>
+        <li>
+          <span class="sec-icon">📝</span>
+          <span class="sec-text"><strong>Auditoria:</strong> Todas as alterações em chamados são registradas no histórico com data, hora, autor e descrição da mudança — garantindo rastreabilidade completa.</span>
+        </li>
+      </ul>
+    </div>
+
+    <!-- 8. PRÓXIMOS PASSOS -->
+    <div class="section">
+      <div class="section-title">
+        <div class="section-icon">🚀</div>
+        8. Próximos Passos
+      </div>
+      <div class="roadmap">
+        <div class="roadmap-item">
+          <div class="roadmap-num">1</div>
+          <div class="roadmap-content">
+            <div class="rt">Migração para Firebase (em andamento)</div>
+            <div class="rs">Substituição do armazenamento local por Firestore com autenticação real e regras de segurança server-side.</div>
+          </div>
+        </div>
+        <div class="roadmap-item">
+          <div class="roadmap-num">2</div>
+          <div class="roadmap-content">
+            <div class="rt">Notificações por e-mail</div>
+            <div class="rs">Alertas automáticos ao usuário quando o status do chamado for atualizado ou quando estiver próximo do prazo.</div>
+          </div>
+        </div>
+        <div class="roadmap-item">
+          <div class="roadmap-num">3</div>
+          <div class="roadmap-content">
+            <div class="rt">Integração com Active Directory / SSO</div>
+            <div class="rs">Login único via credenciais corporativas da Rede D'Or, eliminando a necessidade de senha separada.</div>
+          </div>
+        </div>
+        <div class="roadmap-item">
+          <div class="roadmap-num">4</div>
+          <div class="roadmap-content">
+            <div class="rt">Aplicativo mobile (PWA)</div>
+            <div class="rs">Versão progressiva para acesso e notificações push em dispositivos móveis, sem necessidade de instalação.</div>
+          </div>
+        </div>
+        <div class="roadmap-item">
+          <div class="roadmap-num">5</div>
+          <div class="roadmap-content">
+            <div class="rt">Upload de anexos</div>
+            <div class="rs">Permitir que usuários anexem arquivos (briefings, logos, documentos) diretamente ao chamado.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="text-align:center;color:var(--muted);font-size:.8rem;margin-top:48px;padding-top:24px;border-top:1px solid var(--border)">
+      Documento interno &mdash; Rede D'Or São Luiz &bull; Marketing &amp; Comunicação &bull; 2026<br>
+      <a href="index.html" style="color:var(--accent);text-decoration:none;margin-top:6px;display:inline-block">← Voltar ao portal</a>
+    </div>
+
+  </div>
+
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+<script src="assets/js/firebase-config.js"></script>
+<script src="assets/js/utils.js"></script>
+<script src="assets/js/seed.js"></script>
+<script src="assets/js/auth.js"></script>
+<script src="assets/js/nav.js"></script>
+<script>
+  window._authReady.then(() => initNav('documentacao'));
+</script>
+</body>
+</html>

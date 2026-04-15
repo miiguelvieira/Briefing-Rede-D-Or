@@ -128,6 +128,53 @@
     .timeline-note { font-size: .88rem; color: var(--muted); line-height: 1.5; }
     .timeline-author { font-size: .77rem; color: var(--muted); margin-top: 4px; font-style: italic; }
 
+    /* COMMENTS */
+    .comment-form { margin-top: 20px; margin-bottom: 8px; }
+    .comment-form textarea {
+      width: 100%; background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 10px; padding: 11px 14px; color: var(--text);
+      font-size: .93rem; font-family: inherit; outline: none;
+      transition: border-color .15s; resize: vertical; min-height: 80px; box-sizing: border-box;
+    }
+    .comment-form textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
+    .comment-attach { display: flex; align-items: center; gap: 10px; margin: 8px 0; }
+    .btn-attach {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 7px 13px; border-radius: 8px; border: 1px solid var(--border);
+      background: var(--surface2); color: var(--muted); font-size: .82rem; font-weight: 600;
+      cursor: pointer; transition: all .15s; white-space: nowrap;
+    }
+    .btn-attach:hover { border-color: var(--accent); color: var(--accent); }
+    .btn-attach input[type="file"] { display: none; }
+    .file-name-label { font-size: .8rem; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 180px; }
+    .btn-send-comment {
+      width: 100%; padding: 11px; border-radius: 10px; border: none;
+      background: var(--accent); color: #fff; font-size: .93rem; font-weight: 700;
+      font-family: inherit; cursor: pointer; transition: all .18s;
+      box-shadow: 0 4px 16px rgba(168,85,247,.3); margin-top: 4px;
+    }
+    .btn-send-comment:hover { filter: brightness(1.1); }
+    .btn-send-comment:disabled { opacity: .5; cursor: not-allowed; filter: none; }
+    .comments-list { margin-top: 12px; display: flex; flex-direction: column; gap: 10px; }
+    .comment-item {
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 10px; padding: 12px 14px;
+    }
+    .comment-meta { display: flex; gap: 10px; align-items: baseline; margin-bottom: 6px; flex-wrap: wrap; }
+    .comment-author { font-size: .8rem; font-weight: 700; color: var(--text); }
+    .comment-role { font-size: .72rem; color: var(--muted); }
+    .comment-date { font-size: .75rem; color: var(--muted); margin-left: auto; }
+    .comment-text { font-size: .88rem; color: var(--muted); line-height: 1.5; white-space: pre-wrap; }
+    .comment-attachment { margin-top: 8px; }
+    .comment-attachment a {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: .8rem; color: var(--accent); text-decoration: none;
+      background: var(--accent-bg); border: 1px solid rgba(168,85,247,.2);
+      border-radius: 6px; padding: 4px 10px;
+    }
+    .comment-attachment a:hover { text-decoration: underline; }
+    .comments-empty { font-size: .85rem; color: var(--muted); text-align: center; padding: 16px 0; }
+
     @media (max-width: 580px) {
       .topbar { padding: 10px 16px; }
       .search-wrap { max-width: none; flex: 1; }
@@ -164,7 +211,6 @@
         <button class="pill" data-status="aberto">Aberto</button>
         <button class="pill" data-status="em_andamento">Em Andamento</button>
         <button class="pill" data-status="resolvido">Resolvido</button>
-        <button class="pill" data-status="fechado">Fechado</button>
       </div>
       <div class="sort-wrap">
         <select id="sortSelect">
@@ -197,18 +243,46 @@
         <div class="detail-info-grid" id="detailInfoGrid"></div>
         <div class="section-title">Histórico do Chamado</div>
         <div class="timeline" id="detailTimeline"></div>
+
+        <div class="section-title" style="margin-top:28px;">Comentários</div>
+        <div class="comments-list" id="commentsList">
+          <div class="comments-empty">Carregando comentários...</div>
+        </div>
+        <div class="comment-form" id="commentForm">
+          <textarea id="commentText" placeholder="Escreva um comentário ou adicione uma observação..."></textarea>
+          <div class="comment-attach">
+            <label class="btn-attach">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+              Anexar arquivo
+              <input type="file" id="commentFile" accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.zip" />
+            </label>
+            <span class="file-name-label" id="commentFileName"></span>
+          </div>
+          <button class="btn-send-comment" id="btnSendComment">Enviar comentário</button>
+        </div>
       </div>
     </div>
   </div>
 
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js"></script>
+<script src="assets/js/firebase-config.js"></script>
 <script src="assets/js/utils.js"></script>
 <script src="assets/js/seed.js"></script>
 <script src="assets/js/auth.js"></script>
 <script src="assets/js/nav.js"></script>
 <script>
-/* ─── AUTH + NAV ──────────────────────────────────────────────────────────── */
-const session = guardAuth('user');
-initNav('portal');
+/* ─── ASYNC INIT ──────────────────────────────────────────────────────────── */
+let session;
+(async () => {
+  session = await guardAuth('user');
+  if (!session) return;
+  await loadData();
+  initNav('portal');
+  render();
+})();
 
 /* ─── STATE ───────────────────────────────────────────────────────────────── */
 let currentStatus = 'todos';
@@ -336,13 +410,19 @@ function openDetail(id) {
     </div>
   `).join('');
 
+  _currentDetailId = id;
+  document.getElementById('commentText').value = '';
+  document.getElementById('commentFile').value = '';
+  document.getElementById('commentFileName').textContent = '';
   document.getElementById('detailOverlay').classList.add('open');
   document.body.style.overflow = 'hidden';
+  loadComments(id);
 }
 
 function closeDetail() {
   document.getElementById('detailOverlay').classList.remove('open');
   document.body.style.overflow = '';
+  _currentDetailId = null;
 }
 
 document.getElementById('btnClose').addEventListener('click', closeDetail);
@@ -351,7 +431,89 @@ document.getElementById('detailOverlay').addEventListener('click', e => {
 });
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDetail(); });
 
-render();
+/* ─── COMMENTS ────────────────────────────────────────────────────────────── */
+let _currentDetailId = null;
+
+async function loadComments(ticketId) {
+  const list = document.getElementById('commentsList');
+  list.innerHTML = '<div class="comments-empty">Carregando...</div>';
+  try {
+    const snap = await db.collection('tickets').doc(ticketId)
+      .collection('comments').orderBy('date', 'asc').get();
+    if (snap.empty) {
+      list.innerHTML = '<div class="comments-empty">Nenhum comentário ainda.</div>';
+      return;
+    }
+    list.innerHTML = snap.docs.map(d => {
+      const c = d.data();
+      const att = c.attachment
+        ? `<div class="comment-attachment"><a href="${c.attachment.url}" target="_blank" rel="noopener">
+             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+             ${c.attachment.name}</a></div>` : '';
+      return `<div class="comment-item">
+        <div class="comment-meta">
+          <span class="comment-author">${c.author}</span>
+          <span class="comment-role">${c.role === 'admin' ? 'Admin' : c.role === 'analyst' ? 'Analista' : 'Usuário'}</span>
+          <span class="comment-date">${fmtDateTime(c.date)}</span>
+        </div>
+        <div class="comment-text">${c.text.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>
+        ${att}
+      </div>`;
+    }).join('');
+  } catch(e) {
+    list.innerHTML = '<div class="comments-empty">Erro ao carregar comentários.</div>';
+  }
+}
+
+document.getElementById('commentFile').addEventListener('change', e => {
+  const f = e.target.files[0];
+  document.getElementById('commentFileName').textContent = f ? f.name : '';
+});
+
+document.getElementById('btnSendComment').addEventListener('click', async () => {
+  const ticketId = _currentDetailId;
+  if (!ticketId) return;
+  const text = document.getElementById('commentText').value.trim();
+  if (!text) { document.getElementById('commentText').style.borderColor = '#ef4444'; return; }
+  document.getElementById('commentText').style.borderColor = '';
+
+  const btn = document.getElementById('btnSendComment');
+  btn.disabled = true;
+  btn.textContent = 'Enviando...';
+
+  try {
+    let attachment = null;
+    const fileInput = document.getElementById('commentFile');
+    const file = fileInput.files[0];
+    if (file) {
+      const path = `attachments/${ticketId}/${Date.now()}_${file.name}`;
+      const ref = storage.ref(path);
+      await ref.put(file);
+      const url = await ref.getDownloadURL();
+      attachment = { name: file.name, url };
+    }
+
+    const comment = {
+      author:     session.name,
+      authorId:   session.userId,
+      role:       session.role,
+      date:       new Date().toISOString(),
+      text,
+      attachment,
+    };
+
+    await db.collection('tickets').doc(ticketId).collection('comments').add(comment);
+    document.getElementById('commentText').value = '';
+    fileInput.value = '';
+    document.getElementById('commentFileName').textContent = '';
+    await loadComments(ticketId);
+  } catch(e) {
+    alert('Erro ao enviar comentário. Verifique se o Firebase Storage está ativado.');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Enviar comentário';
+  }
+});
 </script>
 </body>
 </html>

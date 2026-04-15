@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nova Senha · Portal de Atendimento Rede D'Or</title>
+  <link rel="stylesheet" href="assets/css/shared.css" />
+  <style>
+    body {
+      background: var(--bg); color: var(--text);
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      min-height: 100vh; display: flex; flex-direction: column;
+    }
+    .page-wrap {
+      flex: 1; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; padding: 32px 24px;
+    }
+    .logo-area { text-align: center; margin-bottom: 32px; }
+    .badge {
+      display: inline-block; background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 999px; padding: 6px 16px; font-size: 11px; letter-spacing: .08em;
+      text-transform: uppercase; color: var(--muted); margin-bottom: 16px;
+    }
+    .logo-area h1 {
+      font-size: clamp(1.3rem, 3vw, 1.8rem); font-weight: 800; letter-spacing: -.02em;
+      background: linear-gradient(135deg, #e8eaf6 30%, #8892b0);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .logo-area p { color: var(--muted); font-size: .9rem; margin-top: 8px; }
+
+    .card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius-lg); padding: 36px; width: 100%; max-width: 420px;
+    }
+    .card h2 { font-size: 1.1rem; font-weight: 700; margin-bottom: 4px; }
+    .card .sub { color: var(--muted); font-size: .87rem; margin-bottom: 24px; }
+
+    .field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+    label { font-size: .82rem; font-weight: 600; color: var(--muted); }
+    input {
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 10px; padding: 12px 14px;
+      color: var(--text); font-size: .93rem; font-family: inherit;
+      outline: none; transition: border-color .15s, box-shadow .15s; width: 100%;
+      box-sizing: border-box;
+    }
+    input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
+    input::placeholder { color: var(--muted); opacity: .6; }
+
+    .strength-bar-wrap { height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; margin-top: 4px; }
+    .strength-bar { height: 100%; width: 0; background: var(--accent); border-radius: 2px; transition: width .2s, background .2s; }
+
+    .btn-primary {
+      width: 100%; padding: 13px; border-radius: 10px; border: none;
+      background: var(--accent); color: #fff; font-size: .95rem; font-weight: 700;
+      font-family: inherit; cursor: pointer; transition: all .18s;
+      box-shadow: 0 4px 20px rgba(168,85,247,.35); margin-top: 4px;
+    }
+    .btn-primary:hover:not(:disabled) { filter: brightness(1.1); transform: translateY(-1px); }
+    .btn-primary:disabled { opacity: .6; cursor: not-allowed; transform: none; }
+
+    .msg {
+      border-radius: 8px; padding: 10px 14px;
+      font-size: .85rem; margin-top: 12px; text-align: center; display: none;
+    }
+    .msg.show { display: block; }
+    .msg.error   { background: rgba(239,68,68,.1); border: 1px solid rgba(239,68,68,.35); color: #ef4444; }
+    .msg.success { background: rgba(16,185,129,.1); border: 1px solid rgba(16,185,129,.25); color: #10b981; }
+
+    .back-link {
+      display: block; text-align: center; margin-top: 18px;
+      color: var(--muted); font-size: .83rem; text-decoration: none; transition: color .15s;
+    }
+    .back-link:hover { color: var(--text); }
+
+    .icon-big { font-size: 3rem; text-align: center; margin-bottom: 16px; }
+
+    footer { text-align: center; padding: 20px; color: var(--muted); font-size: .78rem; border-top: 1px solid var(--border); }
+  </style>
+</head>
+<body>
+
+  <nav class="main-nav" id="mainNav"></nav>
+
+  <div class="page-wrap">
+    <div class="logo-area">
+      <div class="badge">Rede D'Or · Portal de Atendimento</div>
+      <h1>Definir nova senha</h1>
+      <p>Escolha uma senha segura para sua conta</p>
+    </div>
+
+    <div class="card" id="formCard">
+      <h2>Nova senha</h2>
+      <p class="sub" id="userEmailLabel">Definindo senha para sua conta</p>
+
+      <div class="field">
+        <label for="newPassword">Nova senha</label>
+        <input type="password" id="newPassword" placeholder="Mínimo 6 caracteres" autocomplete="new-password" />
+        <div class="strength-bar-wrap"><div class="strength-bar" id="strengthBar"></div></div>
+      </div>
+
+      <div class="field">
+        <label for="confirmPassword">Confirmar nova senha</label>
+        <input type="password" id="confirmPassword" placeholder="Repita a senha" autocomplete="new-password" />
+      </div>
+
+      <button class="btn-primary" id="btnSave">Salvar nova senha</button>
+      <div class="msg error"  id="errorMsg"></div>
+      <div class="msg success" id="successMsg"></div>
+
+      <a href="login.html" class="back-link">← Voltar ao login</a>
+    </div>
+
+    <!-- Invalid / expired link state -->
+    <div class="card" id="invalidCard" style="display:none; text-align:center;">
+      <div class="icon-big">⚠️</div>
+      <h2>Link inválido ou expirado</h2>
+      <p class="sub">Este link de redefinição já foi usado ou expirou.<br>Solicite um novo link na página de recuperação de senha.</p>
+      <a href="recuperar-senha.html" class="btn-primary" style="display:block;text-decoration:none;text-align:center;margin-top:16px;">Solicitar novo link</a>
+      <a href="login.html" class="back-link">← Voltar ao login</a>
+    </div>
+  </div>
+
+  <footer>&copy; 2026 Rede D'Or · Central de Atendimento</footer>
+
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+<script src="assets/js/firebase-config.js"></script>
+<script src="assets/js/auth.js"></script>
+<script src="assets/js/nav.js"></script>
+<script>
+(async () => {
+  initNav('login');
+
+  // Read action params from URL
+  const params  = new URLSearchParams(window.location.search);
+  const mode    = params.get('mode');
+  const oobCode = params.get('oobCode');
+
+  if (mode !== 'resetPassword' || !oobCode) {
+    document.getElementById('formCard').style.display    = 'none';
+    document.getElementById('invalidCard').style.display = 'block';
+    return;
+  }
+
+  // Verify code and get associated email
+  try {
+    const email = await auth.verifyPasswordResetCode(oobCode);
+    document.getElementById('userEmailLabel').textContent = `Definindo senha para: ${email}`;
+  } catch {
+    document.getElementById('formCard').style.display    = 'none';
+    document.getElementById('invalidCard').style.display = 'block';
+    return;
+  }
+
+  // Password strength indicator
+  document.getElementById('newPassword').addEventListener('input', function () {
+    const v = this.value;
+    const bar = document.getElementById('strengthBar');
+    if (!v)          { bar.style.width = '0'; return; }
+    if (v.length < 6){ bar.style.width = '25%'; bar.style.background = '#ef4444'; return; }
+    if (v.length < 8){ bar.style.width = '50%'; bar.style.background = '#f59e0b'; return; }
+    if (v.length < 12 || !/[^a-zA-Z0-9]/.test(v)){ bar.style.width = '75%'; bar.style.background = '#3b82f6'; return; }
+    bar.style.width = '100%'; bar.style.background = '#10b981';
+  });
+
+  document.getElementById('btnSave').addEventListener('click', async () => {
+    const newPass  = document.getElementById('newPassword').value;
+    const confirm  = document.getElementById('confirmPassword').value;
+    const errorEl  = document.getElementById('errorMsg');
+    const successEl = document.getElementById('successMsg');
+    const btn      = document.getElementById('btnSave');
+
+    errorEl.classList.remove('show');
+    successEl.classList.remove('show');
+
+    if (!newPass || newPass.length < 6) {
+      errorEl.textContent = 'A senha deve ter pelo menos 6 caracteres.';
+      errorEl.classList.add('show');
+      return;
+    }
+    if (newPass !== confirm) {
+      errorEl.textContent = 'As senhas não coincidem.';
+      errorEl.classList.add('show');
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = 'Salvando...';
+
+    try {
+      await auth.confirmPasswordReset(oobCode, newPass);
+      successEl.textContent = 'Senha alterada com sucesso! Redirecionando ao login...';
+      successEl.classList.add('show');
+      btn.style.display = 'none';
+      setTimeout(() => { window.location.href = 'login.html'; }, 2500);
+    } catch (err) {
+      errorEl.textContent = err.code === 'auth/expired-action-code' || err.code === 'auth/invalid-action-code'
+        ? 'Link expirado. Solicite um novo na página de recuperação.'
+        : (err.message || 'Erro ao salvar senha. Tente novamente.');
+      errorEl.classList.add('show');
+      btn.disabled = false;
+      btn.textContent = 'Salvar nova senha';
+    }
+  });
+})();
+</script>
+</body>
+</html>

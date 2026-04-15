@@ -170,13 +170,20 @@
 
   <footer>&copy; 2026 Rede D'Or · Central de Atendimento</footer>
 
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+<script src="assets/js/firebase-config.js"></script>
 <script src="assets/js/utils.js"></script>
 <script src="assets/js/seed.js"></script>
 <script src="assets/js/auth.js"></script>
 <script src="assets/js/nav.js"></script>
 <script>
-  redirectIfLoggedIn();
-  initNav('cadastro');
+  (async () => {
+    // Sign out any stale session — registration must always be accessible
+    try { await auth.signOut(); } catch (_) {}
+    initNav('cadastro');
+  })();
 
 // Password strength indicator
 document.getElementById('regPassword').addEventListener('input', function() {
@@ -195,7 +202,7 @@ document.getElementById('regPassword').addEventListener('input', function() {
   if (el) el.addEventListener('input', () => el.classList.remove('error'));
 });
 
-document.getElementById('registerForm').addEventListener('submit', function(e) {
+document.getElementById('registerForm').addEventListener('submit', async function(e) {
   e.preventDefault();
 
   const name     = document.getElementById('fullName').value.trim();
@@ -227,34 +234,46 @@ document.getElementById('registerForm').addEventListener('submit', function(e) {
 
   if (!valid) return;
 
-  // Check if email already exists
-  const users = JSON.parse(localStorage.getItem('sdr_users') || '[]');
-  if (users.find(u => u.email.toLowerCase() === email)) {
-    document.getElementById('regEmail').classList.add('error');
-    document.getElementById('err-email').classList.add('show');
-    return;
+  const btn = document.querySelector('.btn-register');
+  btn.disabled = true;
+  btn.textContent = 'Criando conta...';
+
+  try {
+    // Create Firebase Auth account
+    const cred = await auth.createUserWithEmailAndPassword(email, pass);
+
+    // Generate initials
+    const parts = name.trim().split(' ');
+    const initials = (parts[0][0] + (parts[parts.length - 1][0] || '')).toUpperCase();
+
+    // Save user profile in Firestore
+    await db.collection('users').doc(cred.user.uid).set({
+      numericId:  Date.now(), // unique numeric ID for ticket references
+      name:       name,
+      email:      email,
+      role:       'user',
+      department: dept,
+      sector:     null,
+      initials:   initials,
+      active:     true,
+    });
+
+    await auth.signOut(); // Sign out so they log in normally
+
+    successMsg.classList.add('show');
+    setTimeout(() => { window.location.href = 'login.html'; }, 2000);
+  } catch (err) {
+    const errEl = document.getElementById('errorMsg');
+    if (err.code === 'auth/email-already-in-use') {
+      document.getElementById('regEmail').classList.add('error');
+      document.getElementById('err-email').classList.add('show');
+    } else {
+      errEl.textContent = err.message || 'Erro ao criar conta. Tente novamente.';
+      errEl.classList.add('show');
+    }
+    btn.disabled = false;
+    btn.textContent = 'Criar conta';
   }
-
-  // Generate initials
-  const parts = name.trim().split(' ');
-  const initials = (parts[0][0] + (parts[parts.length - 1][0] || '')).toUpperCase();
-
-  const newUser = {
-    id: Date.now(),
-    name: name,
-    email: email,
-    password: pass,
-    role: 'user',
-    department: dept,
-    sector: null,
-    initials: initials
-  };
-
-  users.push(newUser);
-  localStorage.setItem('sdr_users', JSON.stringify(users));
-
-  successMsg.classList.add('show');
-  setTimeout(() => { window.location.href = 'login.html'; }, 2000);
 });
 </script>
 </body>

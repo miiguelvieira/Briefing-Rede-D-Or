@@ -69,16 +69,6 @@
     .row-links a.highlight { color: var(--accent); font-weight: 600; }
     .divider { border: none; border-top: 1px solid var(--border); margin: 22px 0; }
 
-    .demo-hint {
-      background: var(--accent-bg); border: 1px solid rgba(168,85,247,.2);
-      border-radius: 10px; padding: 14px 16px; font-size: .81rem; color: var(--muted);
-    }
-    .demo-hint .demo-title { font-weight: 700; color: var(--accent); margin-bottom: 10px; font-size: .83rem; }
-    .demo-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; flex-wrap: wrap; gap: 4px; }
-    .demo-row:last-child { margin-bottom: 0; }
-    .demo-role { font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); min-width: 80px; }
-    .demo-creds { font-family: monospace; font-size: .8rem; color: var(--text); }
-    .demo-creds strong { color: var(--accent); }
 
     footer { text-align: center; padding: 20px; color: var(--muted); font-size: .78rem; border-top: 1px solid var(--border); }
   </style>
@@ -113,66 +103,76 @@
       </form>
 
       <div class="row-links">
-        <a href="#">Esqueci minha senha</a>
+        <a href="recuperar-senha.html">Esqueci minha senha</a>
         <a href="cadastro.html" class="highlight">Criar conta →</a>
       </div>
 
-      <hr class="divider" />
-
-      <div class="demo-hint">
-        <div class="demo-title">Acessos de demonstração</div>
-        <div class="demo-row">
-          <span class="demo-role">👑 Admin</span>
-          <span class="demo-creds"><strong>miguel.vieiraa@rededor.com.br</strong> · admin123</span>
-        </div>
-        <div class="demo-row">
-          <span class="demo-role">🎨 Criação</span>
-          <span class="demo-creds"><strong>leonardo.achilles@rededor.com.br</strong> · criacao123</span>
-        </div>
-        <div class="demo-row">
-          <span class="demo-role">🎪 Eventos</span>
-          <span class="demo-creds"><strong>isabelle.monteiro@rededor.com.br</strong> · eventos123</span>
-        </div>
-        <div class="demo-row">
-          <span class="demo-role">🤝 Patrocínio</span>
-          <span class="demo-creds"><strong>thereza.gerhard@rededor.com.br</strong> · patrocinio123</span>
-        </div>
-        <div class="demo-row">
-          <span class="demo-role">👤 Usuário</span>
-          <span class="demo-creds"><strong>maria.santos@rededor.com.br</strong> · usuario123</span>
-        </div>
-      </div>
     </div>
   </div>
 
   <footer>&copy; 2026 Rede D'Or · Central de Atendimento</footer>
 
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+<script src="assets/js/firebase-config.js"></script>
 <script src="assets/js/utils.js"></script>
 <script src="assets/js/seed.js"></script>
 <script src="assets/js/auth.js"></script>
 <script src="assets/js/nav.js"></script>
 <script>
-  redirectIfLoggedIn();
-  initNav('login');
+  (async () => {
+    await redirectIfLoggedIn();
+    initNav('login');
+  })();
 
-  document.getElementById('loginForm').addEventListener('submit', function(e) {
+  document.getElementById('loginForm').addEventListener('submit', async function(e) {
     e.preventDefault();
     const email    = document.getElementById('email').value.trim().toLowerCase();
     const password = document.getElementById('password').value;
     const errorEl  = document.getElementById('errorMsg');
+    const btn      = document.querySelector('.btn-login');
 
-    const users = getUsers();
-    const user  = users.find(u => u.email.toLowerCase() === email && u.password === password);
+    btn.disabled = true;
+    btn.textContent = 'Entrando...';
+    errorEl.classList.remove('show');
 
-    if (!user) {
+    try {
+      // Wait for seed to finish before signing in — prevents seed's signOut
+      // from kicking out the user's freshly created session (race condition)
+      if (window._seedPromise) await window._seedPromise;
+
+      const cred = await auth.signInWithEmailAndPassword(email, password);
+      // Fetch profile directly — _authReady already resolved null at page load
+      // and awaiting it again would return that stale null even after signIn
+      const doc = await db.collection('users').doc(cred.user.uid).get();
+      if (!doc.exists) {
+        await auth.signOut();
+        throw new Error('E-mail ou senha incorretos. Tente novamente.');
+      }
+      const data = doc.data();
+      if (data.active === false) {
+        await auth.signOut();
+        throw new Error('Conta desativada. Entre em contato com o administrador.');
+      }
+      // Update currentSession so guardAuth works on the next page
+      window.currentSession = {
+        uid: cred.user.uid, userId: data.numericId, role: data.role,
+        sector: data.sector || null, name: data.name, email: data.email,
+        department: data.department, initials: data.initials || data.name.slice(0, 2).toUpperCase(),
+        active: data.active !== false,
+      };
+      window.location.href = data.role === 'user' ? 'portal.html' : 'painel.html';
+    } catch (err) {
+      const authErrors = ['auth/invalid-credential','auth/wrong-password','auth/user-not-found','auth/invalid-email','auth/too-many-requests'];
+      errorEl.textContent = authErrors.includes(err.code)
+        ? 'E-mail ou senha incorretos. Tente novamente.'
+        : (err.message || 'Erro ao entrar. Tente novamente.');
       errorEl.classList.add('show');
       document.getElementById('password').value = '';
-      return;
+      btn.disabled = false;
+      btn.textContent = 'Entrar';
     }
-
-    errorEl.classList.remove('show');
-    createSession(user);
-    window.location.href = user.role === 'user' ? 'portal.html' : 'painel.html';
   });
 
   ['email', 'password'].forEach(id => {

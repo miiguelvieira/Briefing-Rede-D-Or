@@ -155,6 +155,7 @@
     .period-filter { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
     .period-filter .pill { padding: 5px 12px; font-size: .8rem; }
     .period-filter .filter-select { padding: 5px 10px; font-size: .8rem; }
+    .period-range-label { font-size: .78rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; }
     .btn-export-wrap { position: relative; margin-left: auto; }
     .btn-export {
       display: flex; align-items: center; gap: 8px;
@@ -229,11 +230,156 @@
     .workload-bar { height: 6px; background: var(--border); border-radius: 3px; margin-top: 4px; }
     .workload-bar-fill { height: 100%; border-radius: 3px; background: var(--accent); }
 
+    /* USERS TAB */
+    .role-badge { display: inline-block; padding: 3px 10px; border-radius: var(--radius-full); font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; }
+    .role-badge.admin    { background: rgba(245,158,11,.12); border: 1px solid rgba(245,158,11,.3); color: #f59e0b; }
+    .role-badge.analyst  { background: var(--accent-bg); border: 1px solid rgba(168,85,247,.25); color: var(--accent); }
+    .role-badge.user     { background: rgba(16,185,129,.1); border: 1px solid rgba(16,185,129,.25); color: #10b981; }
+    .user-toggle-btn { padding: 5px 12px; border-radius: 6px; border: 1px solid var(--border); background: none; color: var(--muted); font-size: .78rem; font-weight: 600; font-family: inherit; cursor: pointer; transition: all .15s; }
+    .user-toggle-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .user-toggle-btn.inactive { border-color: rgba(239,68,68,.35); color: #ef4444; }
+    .user-toggle-btn.inactive:hover { background: rgba(239,68,68,.1); }
+    .btn-reset-pwd { padding: 5px 10px; border-radius: 6px; border: 1px solid rgba(245,158,11,.3); background: none; color: #f59e0b; font-size: .75rem; font-weight: 600; font-family: inherit; cursor: pointer; transition: all .15s; white-space: nowrap; }
+    .btn-reset-pwd:hover { background: rgba(245,158,11,.1); }
+    .creds-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius-md); padding: 20px 22px; margin-bottom: 24px;
+    }
+    .creds-card h4 { font-size: .85rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 14px; }
+    .creds-table { width: 100%; border-collapse: collapse; }
+    .creds-table th { padding: 8px 12px; text-align: left; font-size: .72rem; color: var(--muted); font-weight: 700; text-transform: uppercase; letter-spacing: .06em; border-bottom: 1px solid var(--border); }
+    .creds-table td { padding: 10px 12px; font-size: .85rem; border-bottom: 1px solid var(--border); }
+    .creds-table tr:last-child td { border-bottom: none; }
+    .creds-table td code { font-family: monospace; font-size: .83rem; color: var(--accent); background: var(--accent-bg); padding: 2px 7px; border-radius: 5px; }
+    .pwd-reset-status { font-size: .75rem; margin-left: 8px; }
+
+    /* CONFIRM MODAL */
+    .confirm-modal { max-width: 420px; }
+    .confirm-changes { background: var(--surface2); border-radius: 10px; padding: 14px 16px; margin-bottom: 20px; border: 1px solid var(--border); }
+    .confirm-change-row { display: flex; gap: 8px; align-items: flex-start; font-size: .88rem; padding: 5px 0; border-bottom: 1px solid var(--border); }
+    .confirm-change-row:last-child { border-bottom: none; }
+    .confirm-change-row .c-label { color: var(--muted); min-width: 100px; font-size: .8rem; font-weight: 600; }
+    .confirm-arrow { color: var(--muted); }
+    .btn-confirm { flex: 1; padding: 12px; border-radius: 10px; border: none; background: #10b981; color: #fff; font-size: .93rem; font-weight: 700; font-family: inherit; cursor: pointer; transition: all .18s; box-shadow: 0 4px 16px rgba(16,185,129,.3); }
+    .btn-confirm:hover { filter: brightness(1.1); }
+    .sub-badge { display: inline-block; font-size: .7rem; color: var(--muted); background: var(--surface2); border: 1px solid var(--border); border-radius: 4px; padding: 1px 6px; margin-top: 2px; }
+
+    /* MONTH FLAGS */
+    .month-flags { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+    .month-chip {
+      padding: 5px 11px; border-radius: var(--radius-full); border: 1px solid var(--border);
+      background: var(--surface); color: var(--muted); font-size: .78rem; font-weight: 600;
+      cursor: pointer; transition: all .15s; white-space: nowrap; font-family: inherit;
+    }
+    .month-chip:hover { border-color: var(--accent); color: var(--text); }
+    .month-chip.selected { background: var(--accent-bg); border-color: var(--accent); color: var(--accent); }
+
+    /* DETAIL SIDE PANEL */
+    .dp-overlay {
+      display: none; position: fixed; inset: 0; z-index: 600;
+      background: rgba(0,0,0,.7); backdrop-filter: blur(4px);
+      align-items: flex-start; justify-content: flex-end;
+    }
+    .dp-overlay.open { display: flex; }
+    .dp-panel {
+      width: min(580px, 100vw); height: 100vh; overflow-y: auto;
+      background: var(--surface); border-left: 1px solid var(--border);
+      display: flex; flex-direction: column; animation: slideIn .25s ease;
+    }
+    @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
+    .dp-header {
+      position: sticky; top: 0; background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 18px 22px; display: flex; align-items: center; gap: 10px; z-index: 2;
+    }
+    .dp-header-info { flex: 1; min-width: 0; }
+    .dp-protocol { font-family: monospace; font-size: .88rem; font-weight: 700; letter-spacing: .04em; margin-bottom: 2px; }
+    .dp-protocol.art { color: var(--art); }
+    .dp-protocol.evt { color: var(--evt); }
+    .dp-protocol.pat { color: var(--pat); }
+    .dp-title { font-size: 1rem; font-weight: 700; }
+    .dp-btn-close {
+      background: none; border: none; color: var(--muted); cursor: pointer;
+      display: flex; align-items: center; padding: 6px; border-radius: 8px;
+      transition: color .15s, background .15s; flex-shrink: 0;
+    }
+    .dp-btn-close:hover { color: var(--text); background: var(--surface2); }
+    .dp-body { padding: 22px; flex: 1; }
+    .dp-info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 24px; }
+    .dp-info-item { display: flex; flex-direction: column; gap: 4px; }
+    .dp-info-label { font-size: .72rem; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; font-weight: 600; }
+    .dp-info-value { font-size: .9rem; font-weight: 600; color: var(--text); }
+    .dp-section-title {
+      font-size: .72rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+      color: var(--accent); margin-bottom: 14px; padding-bottom: 8px; border-bottom: 1px solid var(--border);
+    }
+
+    /* TIMELINE (painel) */
+    .dp-timeline { display: flex; flex-direction: column; margin-bottom: 28px; }
+    .dp-tl-item { display: flex; gap: 14px; padding-bottom: 20px; }
+    .dp-tl-item:last-child { padding-bottom: 0; }
+    .dp-tl-left { display: flex; flex-direction: column; align-items: center; flex-shrink: 0; }
+    .dp-tl-dot { width: 10px; height: 10px; border-radius: 50%; border: 2px solid var(--accent); background: var(--bg); flex-shrink: 0; margin-top: 4px; }
+    .dp-tl-line { width: 2px; background: var(--border); flex: 1; margin-top: 4px; }
+    .dp-tl-item:last-child .dp-tl-line { display: none; }
+    .dp-tl-content { flex: 1; }
+    .dp-tl-date { font-size: .77rem; color: var(--muted); margin-bottom: 4px; }
+    .dp-tl-note { font-size: .88rem; color: var(--muted); line-height: 1.5; }
+    .dp-tl-author { font-size: .77rem; color: var(--muted); margin-top: 4px; font-style: italic; }
+
+    /* COMMENTS (painel) */
+    .dp-comment-form { margin-bottom: 12px; }
+    .dp-comment-form textarea {
+      width: 100%; background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 10px; padding: 10px 13px; color: var(--text);
+      font-size: .9rem; font-family: inherit; outline: none;
+      transition: border-color .15s; resize: vertical; min-height: 76px; box-sizing: border-box;
+    }
+    .dp-comment-form textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
+    .dp-attach-row { display: flex; align-items: center; gap: 10px; margin: 7px 0; }
+    .dp-btn-attach {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 6px 12px; border-radius: 8px; border: 1px solid var(--border);
+      background: var(--surface2); color: var(--muted); font-size: .8rem; font-weight: 600;
+      cursor: pointer; transition: all .15s; white-space: nowrap;
+    }
+    .dp-btn-attach:hover { border-color: var(--accent); color: var(--accent); }
+    .dp-btn-attach input[type="file"] { display: none; }
+    .dp-file-name { font-size: .78rem; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 170px; }
+    .dp-btn-send {
+      width: 100%; padding: 10px; border-radius: 10px; border: none;
+      background: var(--accent); color: #fff; font-size: .9rem; font-weight: 700;
+      font-family: inherit; cursor: pointer; transition: all .18s;
+      box-shadow: 0 4px 14px rgba(168,85,247,.3); margin-top: 2px;
+    }
+    .dp-btn-send:hover { filter: brightness(1.1); }
+    .dp-btn-send:disabled { opacity: .5; cursor: not-allowed; filter: none; }
+    .dp-comments-list { display: flex; flex-direction: column; gap: 8px; }
+    .dp-comment-item {
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 10px; padding: 11px 13px;
+    }
+    .dp-comment-meta { display: flex; gap: 8px; align-items: baseline; margin-bottom: 5px; flex-wrap: wrap; }
+    .dp-comment-author { font-size: .8rem; font-weight: 700; color: var(--text); }
+    .dp-comment-role { font-size: .7rem; color: var(--muted); }
+    .dp-comment-date { font-size: .74rem; color: var(--muted); margin-left: auto; }
+    .dp-comment-text { font-size: .87rem; color: var(--muted); line-height: 1.5; white-space: pre-wrap; }
+    .dp-comment-att { margin-top: 7px; }
+    .dp-comment-att a {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: .78rem; color: var(--accent); text-decoration: none;
+      background: var(--accent-bg); border: 1px solid rgba(168,85,247,.2);
+      border-radius: 6px; padding: 3px 9px;
+    }
+    .dp-comment-att a:hover { text-decoration: underline; }
+    .dp-comments-empty { font-size: .83rem; color: var(--muted); text-align: center; padding: 14px 0; }
+
     @media (max-width: 768px) {
       .charts-grid { grid-template-columns: 1fr; }
       .chart-full { grid-column: 1; }
       .filter-dates { flex-wrap: wrap; }
       .page { padding: 20px 16px 60px; }
+      .dp-info-grid { grid-template-columns: 1fr; }
     }
     @media (max-width: 580px) {
       .filter-row { gap: 8px; }
@@ -255,6 +401,7 @@
   <div class="tabs-bar">
     <button class="tab-btn active" data-tab="chamados">📋 Chamados</button>
     <button class="tab-btn" data-tab="relatorios">📊 Relatórios</button>
+    <button class="tab-btn" data-tab="usuarios" id="tabUsuarios" style="display:none">👥 Usuários</button>
   </div>
 
   <!-- TAB: CHAMADOS -->
@@ -272,7 +419,6 @@
           <button class="pill" data-status="aberto">Aberto</button>
           <button class="pill" data-status="em_andamento">Em Andamento</button>
           <button class="pill" data-status="resolvido">Resolvido</button>
-          <button class="pill" data-status="fechado">Fechado</button>
         </div>
         <select class="filter-select" id="analystFilter">
           <option value="todos">Todos analistas</option>
@@ -317,24 +463,7 @@
       <div class="report-toprow">
         <div class="period-filter">
           <button class="pill active" id="periodAllBtn">Todo o período</button>
-          <select class="filter-select" id="periodYear">
-            <option value="">Ano</option>
-          </select>
-          <select class="filter-select" id="periodMonth">
-            <option value="">Mês</option>
-            <option value="0">Janeiro</option>
-            <option value="1">Fevereiro</option>
-            <option value="2">Março</option>
-            <option value="3">Abril</option>
-            <option value="4">Maio</option>
-            <option value="5">Junho</option>
-            <option value="6">Julho</option>
-            <option value="7">Agosto</option>
-            <option value="8">Setembro</option>
-            <option value="9">Outubro</option>
-            <option value="10">Novembro</option>
-            <option value="11">Dezembro</option>
-          </select>
+          <div class="month-flags" id="monthFlags"></div>
         </div>
         <div class="btn-export-wrap">
           <button class="btn-export" id="btnExport">
@@ -413,6 +542,44 @@
     </div>
   </div>
 
+  <!-- TAB: USUÁRIOS -->
+  <div class="tab-content" id="tab-usuarios">
+    <div class="page">
+      <div class="filter-row" style="margin-bottom:20px;">
+        <span style="font-weight:700;font-size:1rem;">Contas cadastradas</span>
+        <span class="filter-count" id="usersCount"></span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Nome</th>
+              <th>E-mail</th>
+              <th>Perfil</th>
+              <th>Setor</th>
+              <th>Status</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody id="usersBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONFIRM MODAL -->
+  <div class="modal-overlay" id="confirmModal">
+    <div class="modal confirm-modal">
+      <h3>Confirmar atualização</h3>
+      <div class="modal-sub" id="confirmModalId"></div>
+      <div class="confirm-changes" id="confirmChangesList"></div>
+      <div class="modal-actions">
+        <button class="btn-cancel" id="btnCancelConfirm">Voltar</button>
+        <button class="btn-confirm" id="btnConfirmSave">Confirmar</button>
+      </div>
+    </div>
+  </div>
+
   <!-- EDIT MODAL -->
   <div class="modal-overlay" id="editModal">
     <div class="modal">
@@ -424,7 +591,6 @@
           <option value="aberto">Aberto</option>
           <option value="em_andamento">Em Andamento</option>
           <option value="resolvido">Resolvido</option>
-          <option value="fechado">Fechado</option>
         </select>
       </div>
       <div class="field">
@@ -450,13 +616,65 @@
     </div>
   </div>
 
+  <!-- DETAIL SIDE PANEL -->
+  <div class="dp-overlay" id="dpOverlay">
+    <div class="dp-panel" id="dpPanel">
+      <div class="dp-header">
+        <div class="dp-header-info">
+          <div class="dp-protocol" id="dpProtocol"></div>
+          <div class="dp-title" id="dpTitle"></div>
+        </div>
+        <button class="dp-btn-close" id="dpBtnClose" title="Fechar">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M18 6 6 18M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+      <div class="dp-body">
+        <div class="dp-info-grid" id="dpInfoGrid"></div>
+        <div class="dp-section-title">Histórico do Chamado</div>
+        <div class="dp-timeline" id="dpTimeline"></div>
+        <div class="dp-section-title" style="margin-top:24px;">Comentários</div>
+        <div class="dp-comments-list" id="dpCommentsList">
+          <div class="dp-comments-empty">Carregando...</div>
+        </div>
+        <div class="dp-comment-form" style="margin-top:14px;">
+          <textarea id="dpCommentText" placeholder="Escreva um comentário ou observação..."></textarea>
+          <div class="dp-attach-row">
+            <label class="dp-btn-attach">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+              Anexar arquivo
+              <input type="file" id="dpFileInput" accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.zip" />
+            </label>
+            <span class="dp-file-name" id="dpFileName"></span>
+          </div>
+          <button class="dp-btn-send" id="dpBtnSend">Enviar comentário</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js"></script>
+<script src="assets/js/firebase-config.js"></script>
 <script src="assets/js/utils.js"></script>
 <script src="assets/js/seed.js"></script>
 <script src="assets/js/auth.js"></script>
 <script src="assets/js/nav.js"></script>
 <script>
+/* ─── ASYNC PAGE INIT ─────────────────────────────────────────────────────── */
+let session;
+(async () => {
+  session = await guardAuth('staff');
+  if (!session) return;
+  await loadData();
+  initPage();
+})();
+
+function initPage() {
 /* ─── AUTH + NAV ──────────────────────────────────────────────────────────── */
-const session = guardAuth('staff');
 initNav('painel');
 
 const isAdmin = session.role === 'admin';
@@ -483,6 +701,11 @@ if (!isAdmin) {
   document.getElementById('typeFilter').style.display = 'none';
 }
 
+// Show users tab only for admin
+if (isAdmin) {
+  document.getElementById('tabUsuarios').style.display = '';
+}
+
 /* ─── TABS ────────────────────────────────────────────────────────────────── */
 document.querySelectorAll('.tab-btn').forEach(btn => {
   btn.addEventListener('click', () => {
@@ -491,6 +714,7 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
     btn.classList.add('active');
     document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
     if (btn.dataset.tab === 'relatorios') renderReports();
+    if (btn.dataset.tab === 'usuarios') renderUsersTab();
   });
 });
 
@@ -601,7 +825,7 @@ function renderTable() {
     <tr>
       <td class="mono ${tc}">${t.id}</td>
       <td><span class="type-pill ${tc}">${t.type}</span></td>
-      <td style="max-width:200px;white-space:normal;">${t.title}</td>
+      <td style="max-width:200px;white-space:normal;">${t.title}${t.parentId ? `<br><span class="sub-badge">↳ Vinculado a #${t.parentId}</span>` : ''}</td>
       <td><span class="priority-badge ${t.priority}">${priorityLabel(t.priority)}</span></td>
       <td><span class="status-badge ${t.status}">${statusLabel(t.status)}</span></td>
       <td style="color:var(--muted)">${getUserName(t.userId)}</td>
@@ -611,6 +835,12 @@ function renderTable() {
       <td>${t.resolvedAt ? `<span class="sla-badge ${t.slaStatus}">${slaLabel(t.slaStatus)}</span>` : '—'}</td>
       <td>
         <div class="td-actions">
+          <button class="btn-icon" data-view="${t.id}" title="Ver detalhes">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+              <circle cx="12" cy="12" r="3"/>
+            </svg>
+          </button>
           <button class="btn-icon" data-edit="${t.id}" title="Editar">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
               <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
@@ -622,9 +852,163 @@ function renderTable() {
     </tr>`;
   }).join('');
 
+  body.querySelectorAll('[data-view]').forEach(btn => {
+    btn.addEventListener('click', () => openTicketDetail(btn.dataset.view));
+  });
   body.querySelectorAll('[data-edit]').forEach(btn => {
     btn.addEventListener('click', () => openEditModal(btn.dataset.edit));
   });
+}
+
+/* ─── USERS TAB ───────────────────────────────────────────────────────────── */
+function renderUsersTab() {
+  const users = getUsers();
+  document.getElementById('usersCount').textContent = `${users.length} usuário${users.length !== 1 ? 's' : ''}`;
+  const roleLabel = { admin: '👑 Admin', analyst: 'Analista', user: 'Usuário' };
+  const sectorLabels = { ART: '🎨 Criação', EVT: '🎪 Eventos', PAT: '🤝 Patrocínio' };
+
+  const body = document.getElementById('usersBody');
+  body.innerHTML = users.map(u => {
+    const active = u.active !== false;
+    const resetBtn = isAdmin
+      ? `<button class="btn-reset-pwd" data-reset-email="${u.email}" title="Enviar email de redefinição de senha">🔑 Reset senha</button>`
+      : '';
+    return `<tr style="${!active ? 'opacity:.5' : ''}">
+      <td><strong>${u.name}</strong></td>
+      <td style="color:var(--muted);font-family:monospace;font-size:.82rem">${u.email}</td>
+      <td><span class="role-badge ${u.role}">${roleLabel[u.role] || u.role}</span></td>
+      <td style="color:var(--muted)">${u.sector ? (sectorLabels[u.sector] || u.sector) : '—'}</td>
+      <td><span style="color:${active ? '#10b981' : '#ef4444'};font-size:.82rem;font-weight:600">${active ? 'Ativo' : 'Inativo'}</span></td>
+      <td>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+          <button class="user-toggle-btn${active ? '' : ' inactive'}" data-uid="${u.uid}">
+            ${active ? 'Desativar' : 'Ativar'}
+          </button>
+          ${resetBtn}
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+
+  body.querySelectorAll('[data-uid]').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const allUsers = getUsers();
+      const u = allUsers.find(x => x.uid === btn.dataset.uid);
+      if (!u) return;
+      const newActive = u.active === false;
+      await saveUser(u.uid, { active: newActive });
+      u.active = newActive;
+      renderUsersTab();
+    });
+  });
+
+  if (isAdmin) {
+    body.querySelectorAll('[data-reset-email]').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const email = btn.dataset.resetEmail;
+        try {
+          await auth.sendPasswordResetEmail(email);
+          const status = btn.parentElement.querySelector('.pwd-reset-status') || document.createElement('span');
+          status.className = 'pwd-reset-status';
+          status.style.color = '#10b981';
+          status.textContent = '✓ E-mail enviado!';
+          btn.parentElement.appendChild(status);
+          setTimeout(() => status.remove(), 4000);
+        } catch(e) {
+          alert(`Erro ao enviar e-mail de reset para ${email}: ${e.message}`);
+        }
+      });
+    });
+
+    // Render credentials card
+    _renderCredsCard();
+  }
+}
+
+async function _renderCredsCard() {
+  // Try to get or create the demo_credentials document
+  let credData = { accounts: [] };
+  try {
+    const snap = await db.collection('config').doc('demo_credentials').get();
+    if (snap.exists) credData = snap.data();
+  } catch(e) { /* If permissions not set yet, skip silently */ return; }
+
+  const existing = document.getElementById('credsCard');
+  if (existing) existing.remove();
+
+  const card = document.createElement('div');
+  card.id = 'credsCard';
+  card.className = 'creds-card';
+  card.innerHTML = `
+    <h4>🔐 Credenciais Internas (visível apenas para admin)</h4>
+    <p style="font-size:.82rem;color:var(--muted);margin-bottom:14px;">
+      Use os botões "Reset senha" na tabela para enviar um link de redefinição. Atualize a anotação abaixo após trocar.
+    </p>
+    <table class="creds-table">
+      <thead>
+        <tr>
+          <th>Perfil</th>
+          <th>E-mail</th>
+          <th>Senha atual (anotação)</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="credsBody"></tbody>
+    </table>
+    <button id="btnAddCred" style="margin-top:12px;padding:6px 14px;border-radius:8px;border:1px solid var(--border);background:none;color:var(--muted);font-size:.8rem;font-weight:600;font-family:inherit;cursor:pointer;">+ Adicionar conta</button>
+  `;
+
+  // Insert before the table
+  const tableWrap = document.querySelector('#tab-usuarios .table-wrap');
+  tableWrap.parentElement.insertBefore(card, tableWrap);
+
+  _renderCredsRows(credData.accounts);
+
+  document.getElementById('btnAddCred').addEventListener('click', () => {
+    credData.accounts.push({ role: 'Usuário', email: '', hint: '' });
+    _renderCredsRows(credData.accounts, () => _saveCredData(credData));
+  });
+}
+
+function _renderCredsRows(accounts, onChange) {
+  const tbody = document.getElementById('credsBody');
+  if (!tbody) return;
+  tbody.innerHTML = accounts.map((a, i) => `
+    <tr>
+      <td><input class="cred-input" data-idx="${i}" data-field="role" value="${a.role || ''}" placeholder="Ex: Admin" style="width:90px" /></td>
+      <td><input class="cred-input" data-idx="${i}" data-field="email" value="${a.email || ''}" placeholder="email@rededor.com.br" style="width:220px" /></td>
+      <td><input class="cred-input" data-idx="${i}" data-field="hint" value="${a.hint || ''}" placeholder="Anotação da senha..." style="width:150px" /></td>
+      <td>
+        <button class="cred-del" data-idx="${i}" style="background:none;border:none;color:#ef4444;cursor:pointer;font-size:.8rem;padding:4px 8px;border-radius:6px;" title="Remover">✕</button>
+      </td>
+    </tr>
+  `).join('');
+
+  // Input events
+  tbody.querySelectorAll('.cred-input').forEach(input => {
+    input.style.cssText += 'background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:5px 8px;color:var(--text);font-size:.82rem;font-family:monospace;outline:none;';
+    input.addEventListener('change', () => {
+      const idx = parseInt(input.dataset.idx);
+      accounts[idx][input.dataset.field] = input.value;
+      _saveCredData({ accounts });
+    });
+  });
+
+  tbody.querySelectorAll('.cred-del').forEach(btn => {
+    btn.addEventListener('click', () => {
+      accounts.splice(parseInt(btn.dataset.idx), 1);
+      _renderCredsRows(accounts, onChange);
+      _saveCredData({ accounts });
+    });
+  });
+}
+
+async function _saveCredData(data) {
+  try {
+    await db.collection('config').doc('demo_credentials').set(data);
+  } catch(e) {
+    alert('Erro ao salvar credenciais: ' + e.message);
+  }
 }
 
 /* ─── EDIT MODAL ──────────────────────────────────────────────────────────── */
@@ -667,63 +1051,160 @@ document.getElementById('btnSaveEdit').addEventListener('click', () => {
   noteEl.style.borderColor = '';
 
   const tickets = getTickets();
+  const t = tickets.find(x => x.id === editingId);
+  if (!t) return;
+
+  // Build list of changes to show in confirmation modal
+  const newAnalystId = newAnalyst ? parseInt(newAnalyst) : null;
+  const changes = [];
+  if (t.status !== newStatus)
+    changes.push({ label: 'Status', from: statusLabel(t.status), to: statusLabel(newStatus) });
+  if (t.priority !== newPriority)
+    changes.push({ label: 'Prioridade', from: priorityLabel(t.priority), to: priorityLabel(newPriority) });
+  if (String(t.analystId || '') !== String(newAnalystId || ''))
+    changes.push({ label: 'Responsável', from: getUserName(t.analystId), to: getUserName(newAnalystId) });
+  changes.push({ label: 'Nota', from: '', to: note });
+
+  document.getElementById('confirmModalId').textContent = t.id + ' · ' + t.title.slice(0, 45);
+  document.getElementById('confirmChangesList').innerHTML = changes.map(c =>
+    `<div class="confirm-change-row">
+      <span class="c-label">${c.label}</span>
+      ${c.from ? `<span style="opacity:.7">${c.from}</span><span class="confirm-arrow">→</span>` : ''}
+      <span style="color:var(--text);font-weight:600">${c.to}</span>
+    </div>`
+  ).join('');
+
+  document.getElementById('editModal').classList.remove('open');
+  document.getElementById('confirmModal').classList.add('open');
+});
+
+/* ─── CONFIRM MODAL ───────────────────────────────────────────────────────── */
+document.getElementById('btnCancelConfirm').addEventListener('click', () => {
+  document.getElementById('confirmModal').classList.remove('open');
+  document.getElementById('editModal').classList.add('open');
+});
+document.getElementById('confirmModal').addEventListener('click', e => {
+  if (e.target === document.getElementById('confirmModal')) {
+    document.getElementById('confirmModal').classList.remove('open');
+    document.getElementById('editModal').classList.add('open');
+  }
+});
+
+document.getElementById('btnConfirmSave').addEventListener('click', async () => {
+  if (!editingId) return;
+  const newStatus   = document.getElementById('editStatus').value;
+  const newPriority = document.getElementById('editPriority').value;
+  const newAnalyst  = document.getElementById('editAnalyst').value;
+  const note        = document.getElementById('editNote').value.trim();
+
+  const tickets = getTickets();
   const idx = tickets.findIndex(t => t.id === editingId);
   if (idx === -1) return;
 
   const now = new Date().toISOString();
   const t = tickets[idx];
+  const oldAnalystId = t.analystId;
+  const newAnalystId = newAnalyst ? parseInt(newAnalyst) : null;
+  const analystChanged = String(oldAnalystId || '') !== String(newAnalystId || '') && newAnalystId !== null;
+
   t.status    = newStatus;
   t.priority  = newPriority;
-  t.analystId = newAnalyst ? parseInt(newAnalyst) : null;
+  t.analystId = newAnalystId;
   t.updatedAt = now;
 
-  if ((newStatus === 'resolvido' || newStatus === 'fechado') && !t.resolvedAt) {
+  if (newStatus === 'resolvido' && !t.resolvedAt) {
     t.resolvedAt = now;
     t.slaStatus  = computeSlaStatus(t);
   }
 
   t.history = [...(t.history || []), { date: now, status: newStatus, note, author: session.name }];
   tickets[idx] = t;
+
+  // Create sub-demand when analyst is reassigned
+  if (analystChanged) {
+    const newAnalystUser = getUsers().find(u => u.numericId === newAnalystId);
+    const subType = newAnalystUser?.sector || t.type;
+    const rand = Math.floor(100000 + Math.random() * 900000);
+    const subTicket = {
+      id: `${subType}-${rand}`,
+      parentId: t.id,
+      type: subType,
+      title: `[Demanda] ${t.title}`,
+      status: 'aberto',
+      priority: t.priority,
+      userId: oldAnalystId || session.userId,
+      analystId: newAnalystId,
+      createdAt: now,
+      updatedAt: now,
+      deadline: t.deadline || null,
+      resolvedAt: null,
+      slaStatus: 'no_prazo',
+      history: [{ date: now, status: 'aberto', note: `Sub-demanda criada a partir de #${t.id}. ${note}`, author: session.name }],
+    };
+    tickets.push(subTicket);
+  }
+
   saveTickets(tickets);
-  closeEditModal();
+  document.getElementById('confirmModal').classList.remove('open');
+  document.body.style.overflow = '';
+  editingId = null;
   renderTable();
 });
 
-/* ─── PERIOD FILTER ───────────────────────────────────────────────────────── */
-let reportPeriod = { type: 'all', month: null, year: null };
+/* ─── PERIOD FILTER (month flags) ─────────────────────────────────────────── */
+let selectedMonths = new Set(); // Set of "YYYY-MM" strings
 
-function populateYearSelect() {
-  const yearSel = document.getElementById('periodYear');
-  const years = getTicketYears(getScopedTickets(session));
-  years.forEach(y => {
-    const opt = document.createElement('option');
-    opt.value = y; opt.textContent = y;
-    yearSel.appendChild(opt);
+const MONTH_SHORT = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+
+function buildMonthFlags() {
+  const container = document.getElementById('monthFlags');
+  container.innerHTML = '';
+  const now = new Date();
+  // Generate last 18 months
+  const months = [];
+  for (let i = 17; i >= 0; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    months.push({ year: d.getFullYear(), month: d.getMonth() });
+  }
+  // Also add any months from ticket data not already in the list
+  getScopedTickets(session).forEach(t => {
+    const d = new Date(t.createdAt);
+    const y = d.getFullYear(); const m = d.getMonth();
+    if (!months.find(x => x.year === y && x.month === m)) {
+      months.push({ year: y, month: m });
+    }
+  });
+  months.sort((a, b) => a.year !== b.year ? b.year - a.year : b.month - a.month);
+
+  months.forEach(({ year, month }) => {
+    const key = `${year}-${String(month + 1).padStart(2, '0')}`;
+    const chip = document.createElement('button');
+    chip.className = 'month-chip' + (selectedMonths.has(key) ? ' selected' : '');
+    chip.textContent = `${MONTH_SHORT[month]}/${String(year).slice(2)}`;
+    chip.dataset.key = key;
+    chip.addEventListener('click', () => {
+      if (selectedMonths.has(key)) {
+        selectedMonths.delete(key);
+        chip.classList.remove('selected');
+      } else {
+        selectedMonths.add(key);
+        chip.classList.add('selected');
+      }
+      if (selectedMonths.size === 0) {
+        document.getElementById('periodAllBtn').classList.add('active');
+      } else {
+        document.getElementById('periodAllBtn').classList.remove('active');
+      }
+      renderReports();
+    });
+    container.appendChild(chip);
   });
 }
-populateYearSelect();
 
 document.getElementById('periodAllBtn').addEventListener('click', () => {
-  reportPeriod = { type: 'all', month: null, year: null };
-  document.getElementById('periodYear').value = '';
-  document.getElementById('periodMonth').value = '';
+  selectedMonths.clear();
+  document.querySelectorAll('.month-chip').forEach(c => c.classList.remove('selected'));
   document.getElementById('periodAllBtn').classList.add('active');
-  renderReports();
-});
-
-document.getElementById('periodYear').addEventListener('change', e => {
-  const y = e.target.value ? parseInt(e.target.value) : null;
-  reportPeriod = { type: y ? 'month' : 'all', year: y, month: null };
-  document.getElementById('periodMonth').value = '';
-  document.getElementById('periodAllBtn').classList.toggle('active', !y);
-  renderReports();
-});
-
-document.getElementById('periodMonth').addEventListener('change', e => {
-  const m = e.target.value !== '' ? parseInt(e.target.value) : null;
-  reportPeriod.month = m;
-  reportPeriod.type = (reportPeriod.year || m !== null) ? 'month' : 'all';
-  document.getElementById('periodAllBtn').classList.toggle('active', reportPeriod.type === 'all');
   renderReports();
 });
 
@@ -743,7 +1224,7 @@ document.addEventListener('click', () => {
 
 exportDropdown.querySelectorAll('button[data-action]').forEach(btn => {
   btn.addEventListener('click', () => {
-    const tickets = filterByPeriod(getScopedTickets(session), reportPeriod);
+    const tickets = filterByMonths(getScopedTickets(session), selectedMonths);
     const sectorLabel = session.sector ? SECTOR_META[session.sector]?.label : null;
     const periodLabel = _getPeriodLabel();
 
@@ -760,13 +1241,14 @@ exportDropdown.querySelectorAll('button[data-action]').forEach(btn => {
 });
 
 function _getPeriodLabel() {
-  if (reportPeriod.type === 'all') return 'Todo o período';
-  const months = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
-  if (reportPeriod.month !== null && reportPeriod.year) {
-    return `${months[reportPeriod.month]}/${reportPeriod.year}`;
-  }
-  if (reportPeriod.year) return String(reportPeriod.year);
-  return 'Período selecionado';
+  if (selectedMonths.size === 0) return 'Todo o período';
+  const labels = [...selectedMonths]
+    .sort()
+    .map(k => {
+      const [y, m] = k.split('-').map(Number);
+      return `${MONTH_SHORT[m - 1]}/${String(y).slice(2)}`;
+    });
+  return labels.join(', ');
 }
 
 /* ─── REPORTS ─────────────────────────────────────────────────────────────── */
@@ -780,7 +1262,7 @@ function destroyCharts() {
 
 function renderReports() {
   const base    = getScopedTickets(session);
-  const tickets = filterByPeriod(base, reportPeriod);
+  const tickets = filterByMonths(base, selectedMonths);
 
   const total     = tickets.length;
   const abertos   = tickets.filter(t => t.status === 'aberto').length;
@@ -859,8 +1341,7 @@ function _renderAdminCharts(tickets) {
   const patC = tickets.filter(t => t.type === 'PAT').length;
   const stA  = tickets.filter(t => t.status === 'aberto').length;
   const stAn = tickets.filter(t => t.status === 'em_andamento').length;
-  const stR  = tickets.filter(t => t.status === 'resolvido').length;
-  const stF  = tickets.filter(t => t.status === 'fechado').length;
+  const stR  = tickets.filter(t => t.status === 'resolvido' || t.status === 'fechado').length;
 
   const slaByType = (type, sla) => tickets.filter(t => t.type === type && t.slaStatus === sla).length;
 
@@ -876,8 +1357,8 @@ function _renderAdminCharts(tickets) {
   chartStatus = new Chart(document.getElementById('chartStatus'), {
     type: 'bar',
     data: {
-      labels: ['Aberto','Em Andamento','Resolvido','Fechado'],
-      datasets: [{ label: 'Chamados', data: [stA,stAn,stR,stF], backgroundColor: ['#3b82f6','#f59e0b','#10b981','#8892b0'], borderRadius: 8, borderSkipped: false }]
+      labels: ['Aberto','Em Andamento','Resolvido'],
+      datasets: [{ label: 'Chamados', data: [stA,stAn,stR], backgroundColor: ['#3b82f6','#f59e0b','#10b981'], borderRadius: 8, borderSkipped: false }]
     },
     options: { responsive: true, plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#8892b0' }, grid: { color: '#2e3350' } }, y: { ticks: { color: '#8892b0', stepSize: 1 }, grid: { color: '#2e3350' }, beginAtZero: true } } }
   });
@@ -901,8 +1382,7 @@ function _renderAnalystCharts(tickets, allScopedTickets) {
 
   const stA  = tickets.filter(t => t.status === 'aberto').length;
   const stAn = tickets.filter(t => t.status === 'em_andamento').length;
-  const stR  = tickets.filter(t => t.status === 'resolvido').length;
-  const stF  = tickets.filter(t => t.status === 'fechado').length;
+  const stR  = tickets.filter(t => t.status === 'resolvido' || t.status === 'fechado').length;
 
   const noPrazo = tickets.filter(t => t.slaStatus === 'no_prazo').length;
   const urgencia= tickets.filter(t => t.slaStatus === 'urgencia').length;
@@ -911,8 +1391,8 @@ function _renderAnalystCharts(tickets, allScopedTickets) {
   chartStatusA = new Chart(document.getElementById('chartStatusA'), {
     type: 'bar',
     data: {
-      labels: ['Aberto','Em Andamento','Resolvido','Fechado'],
-      datasets: [{ label: 'Chamados', data: [stA,stAn,stR,stF], backgroundColor: ['#3b82f6','#f59e0b','#10b981','#8892b0'], borderRadius: 8, borderSkipped: false }]
+      labels: ['Aberto','Em Andamento','Resolvido'],
+      datasets: [{ label: 'Chamados', data: [stA,stAn,stR], backgroundColor: ['#3b82f6','#f59e0b','#10b981'], borderRadius: 8, borderSkipped: false }]
     },
     options: { responsive: true, plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#8892b0' }, grid: { color: '#2e3350' } }, y: { ticks: { color: '#8892b0', stepSize: 1 }, grid: { color: '#2e3350' }, beginAtZero: true } } }
   });
@@ -948,8 +1428,159 @@ function _renderAnalystCharts(tickets, allScopedTickets) {
   });
 }
 
+/* ─── MONTH FLAGS INIT ────────────────────────────────────────────────────── */
+buildMonthFlags();
+
+/* ─── DETAIL SIDE PANEL ───────────────────────────────────────────────────── */
+let _dpCurrentId = null;
+
+function openTicketDetail(id) {
+  const t = getTickets().find(x => x.id === id);
+  if (!t) return;
+  _dpCurrentId = id;
+
+  const tc = t.type.toLowerCase();
+  const proto = document.getElementById('dpProtocol');
+  proto.className = `dp-protocol ${tc}`;
+  proto.textContent = t.id;
+  document.getElementById('dpTitle').textContent = t.title;
+
+  document.getElementById('dpInfoGrid').innerHTML = `
+    <div class="dp-info-item"><span class="dp-info-label">Tipo</span><span class="dp-info-value">${typeLabel(t.type)}</span></div>
+    <div class="dp-info-item"><span class="dp-info-label">Status</span><span class="dp-info-value"><span class="status-badge ${t.status}">${statusLabel(t.status)}</span></span></div>
+    <div class="dp-info-item"><span class="dp-info-label">Prioridade</span><span class="dp-info-value"><span class="priority-badge ${t.priority}">${priorityLabel(t.priority)}</span></span></div>
+    <div class="dp-info-item"><span class="dp-info-label">Usuário</span><span class="dp-info-value">${getUserName(t.userId)}</span></div>
+    <div class="dp-info-item"><span class="dp-info-label">Analista</span><span class="dp-info-value">${getUserName(t.analystId)}</span></div>
+    <div class="dp-info-item"><span class="dp-info-label">Aberto em</span><span class="dp-info-value">${fmtDateTime(t.createdAt)}</span></div>
+    ${t.deadline ? `<div class="dp-info-item"><span class="dp-info-label">Prazo</span><span class="dp-info-value">${fmtDate(t.deadline)}</span></div>` : ''}
+    ${t.resolvedAt ? `<div class="dp-info-item"><span class="dp-info-label">Resolvido em</span><span class="dp-info-value">${fmtDateTime(t.resolvedAt)}</span></div>
+    <div class="dp-info-item"><span class="dp-info-label">SLA</span><span class="dp-info-value"><span class="sla-badge ${t.slaStatus}">${slaLabel(t.slaStatus)}</span></span></div>` : ''}
+  `;
+
+  const history = [...(t.history || [])].reverse();
+  document.getElementById('dpTimeline').innerHTML = history.length ? history.map(h => `
+    <div class="dp-tl-item">
+      <div class="dp-tl-left">
+        <div class="dp-tl-dot"></div>
+        <div class="dp-tl-line"></div>
+      </div>
+      <div class="dp-tl-content">
+        <div class="dp-tl-date">${fmtDateTime(h.date)}</div>
+        <div class="dp-tl-note"><span class="status-badge ${h.status}">${statusLabel(h.status)}</span> ${h.note}</div>
+        <div class="dp-tl-author">por ${h.author}</div>
+      </div>
+    </div>
+  `).join('') : '<div style="color:var(--muted);font-size:.85rem">Sem histórico.</div>';
+
+  // Reset comment form
+  document.getElementById('dpCommentText').value = '';
+  document.getElementById('dpFileInput').value = '';
+  document.getElementById('dpFileName').textContent = '';
+
+  document.getElementById('dpOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  _dpLoadComments(id);
+}
+
+function _dpClose() {
+  document.getElementById('dpOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+  _dpCurrentId = null;
+}
+
+document.getElementById('dpBtnClose').addEventListener('click', _dpClose);
+document.getElementById('dpOverlay').addEventListener('click', e => {
+  if (e.target === document.getElementById('dpOverlay')) _dpClose();
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && _dpCurrentId) _dpClose();
+});
+
+async function _dpLoadComments(ticketId) {
+  const list = document.getElementById('dpCommentsList');
+  list.innerHTML = '<div class="dp-comments-empty">Carregando...</div>';
+  try {
+    const snap = await db.collection('tickets').doc(ticketId)
+      .collection('comments').orderBy('date', 'asc').get();
+    if (snap.empty) {
+      list.innerHTML = '<div class="dp-comments-empty">Nenhum comentário ainda.</div>';
+      return;
+    }
+    list.innerHTML = snap.docs.map(d => {
+      const c = d.data();
+      const att = c.attachment
+        ? `<div class="dp-comment-att"><a href="${c.attachment.url}" target="_blank" rel="noopener">
+             <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+             ${c.attachment.name}</a></div>` : '';
+      const roleText = c.role === 'admin' ? 'Admin' : c.role === 'analyst' ? 'Analista' : 'Usuário';
+      return `<div class="dp-comment-item">
+        <div class="dp-comment-meta">
+          <span class="dp-comment-author">${c.author}</span>
+          <span class="dp-comment-role">${roleText}</span>
+          <span class="dp-comment-date">${fmtDateTime(c.date)}</span>
+        </div>
+        <div class="dp-comment-text">${c.text.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>
+        ${att}
+      </div>`;
+    }).join('');
+  } catch(e) {
+    list.innerHTML = '<div class="dp-comments-empty">Erro ao carregar comentários.</div>';
+  }
+}
+
+document.getElementById('dpFileInput').addEventListener('change', e => {
+  const f = e.target.files[0];
+  document.getElementById('dpFileName').textContent = f ? f.name : '';
+});
+
+document.getElementById('dpBtnSend').addEventListener('click', async () => {
+  const ticketId = _dpCurrentId;
+  if (!ticketId) return;
+  const text = document.getElementById('dpCommentText').value.trim();
+  if (!text) { document.getElementById('dpCommentText').style.borderColor = '#ef4444'; return; }
+  document.getElementById('dpCommentText').style.borderColor = '';
+
+  const btn = document.getElementById('dpBtnSend');
+  btn.disabled = true;
+  btn.textContent = 'Enviando...';
+
+  try {
+    let attachment = null;
+    const fileInput = document.getElementById('dpFileInput');
+    const file = fileInput.files[0];
+    if (file) {
+      const path = `attachments/${ticketId}/${Date.now()}_${file.name}`;
+      const ref = storage.ref(path);
+      await ref.put(file);
+      const url = await ref.getDownloadURL();
+      attachment = { name: file.name, url };
+    }
+
+    const comment = {
+      author:     session.name,
+      authorId:   session.userId,
+      role:       session.role,
+      date:       new Date().toISOString(),
+      text,
+      attachment,
+    };
+
+    await db.collection('tickets').doc(ticketId).collection('comments').add(comment);
+    document.getElementById('dpCommentText').value = '';
+    fileInput.value = '';
+    document.getElementById('dpFileName').textContent = '';
+    await _dpLoadComments(ticketId);
+  } catch(e) {
+    alert('Erro ao enviar comentário. Verifique se o Firebase Storage está ativado.');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Enviar comentário';
+  }
+});
+
 /* ─── INIT ────────────────────────────────────────────────────────────────── */
 renderTable();
+} // end initPage()
 </script>
 </body>
 </html>
