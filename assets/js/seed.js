@@ -19,13 +19,15 @@ window._seedPromise = new Promise(resolve => { _seedResolve = resolve; });
   }
 
   /* ── SEED USERS ─────────────────────────────────────────────────────── */
+  // Passwords removed from source code — accounts already exist in Firebase Auth.
+  // Credentials are managed privately via the admin panel (Painel → Usuários → Credenciais Internas).
   const SEED_USERS = [
-    { numericId: 1, name: 'Miguel Vieira',     email: 'miguel.vieiraa@rededor.com.br',    password: '',      role: 'admin',   department: 'Marketing',        sector: null,  initials: 'MV', active: true },
-    { numericId: 2, name: 'Leonardo Achilles', email: 'leonardo.achilles@rededor.com.br', password: '',    role: 'analyst', department: 'Design & Criação', sector: 'ART', initials: 'LA', active: true },
-    { numericId: 3, name: 'Isabelle Monteiro', email: 'isabelle.monteiro@rededor.com.br', password: '',    role: 'analyst', department: 'Eventos',          sector: 'EVT', initials: 'IM', active: true },
+    { numericId: 1, name: 'Miguel Vieira',     email: 'miguel.vieiraa@rededor.com.br',    password: '', role: 'admin',   department: 'Marketing',        sector: null,  initials: 'MV', active: true },
+    { numericId: 2, name: 'Leonardo Achilles', email: 'leonardo.achilles@rededor.com.br', password: '', role: 'analyst', department: 'Design & Criação', sector: 'ART', initials: 'LA', active: true },
+    { numericId: 3, name: 'Isabelle Monteiro', email: 'isabelle.monteiro@rededor.com.br', password: '', role: 'analyst', department: 'Eventos',          sector: 'EVT', initials: 'IM', active: true },
     { numericId: 4, name: 'Thereza Gerhard',   email: 'thereza.gerhard@rededor.com.br',   password: '', role: 'analyst', department: 'Patrocínio',       sector: 'PAT', initials: 'TG', active: true },
-    { numericId: 5, name: 'Maria Santos',      email: 'maria.santos@rededor.com.br',      password: '',    role: 'user',    department: 'Comunicação',      sector: null,  initials: 'MS', active: true },
-    { numericId: 6, name: 'João Oliveira',     email: 'joao.oliveira@rededor.com.br',     password: '',    role: 'user',    department: 'RH',               sector: null,  initials: 'JO', active: true },
+    { numericId: 5, name: 'Maria Santos',      email: 'maria.santos@rededor.com.br',      password: '', role: 'user',    department: 'Comunicação',      sector: null,  initials: 'MS', active: true },
+    { numericId: 6, name: 'João Oliveira',     email: 'joao.oliveira@rededor.com.br',     password: '', role: 'user',    department: 'RH',               sector: null,  initials: 'JO', active: true },
   ];
 
   /* ── DATE HELPERS ────────────────────────────────────────────────────── */
