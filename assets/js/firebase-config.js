@@ -23,5 +23,5 @@ const db      = firebase.firestore();
 /** Auth instance — shared across all modules */
 const auth    = firebase.auth();
 /** Storage instance — shared across all modules */
-const storage = firebase.storage();
+const storage = typeof firebase.storage === 'function' ? firebase.storage() : null;
 
