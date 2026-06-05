@@ -309,6 +309,60 @@
 }
 .toast.show { transform: translateX(-50%) translateY(0); }
 
+/* ── SUCCESS MODAL ──────────────────────────────────────────────────────── */
+.btn-submit {
+  background: #16a34a;
+  color: #fff;
+  gap: 6px;
+}
+.btn-submit:hover:not(:disabled) { background: #15803d; }
+.btn-submit:disabled { opacity: .6; cursor: not-allowed; }
+
+.success-modal {
+  text-align: center;
+  padding: 2rem 1.5rem;
+  max-width: 420px;
+}
+.success-icon { font-size: 3rem; line-height: 1; margin-bottom: .75rem; }
+.success-modal h2 { margin: 0 0 .5rem; font-size: 1.2rem; color: var(--text); }
+.success-protocol {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: .04em;
+  margin: .25rem 0 .75rem;
+}
+.success-responsible {
+  font-size: .85rem;
+  color: var(--text-muted);
+  margin-bottom: 1.25rem;
+}
+.success-hint {
+  font-size: .85rem;
+  color: var(--text-muted);
+  margin-bottom: .75rem;
+}
+.success-actions {
+  display: flex;
+  gap: .75rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+.success-actions .btn { font-size: .82rem; }
+.btn-outlook { background: #0078d4; color: #fff; }
+.btn-outlook:hover { background: #006cbe; }
+.btn-gmail  { background: #ea4335; color: #fff; }
+.btn-gmail:hover  { background: #d33526; }
+.btn-ghost {
+  background: transparent;
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  font-size: .8rem;
+  padding: 6px 18px;
+}
+.btn-ghost:hover { background: var(--surface-2); }
+
 /* ── PRINT STYLES ───────────────────────────────────────────────────────── */
 @media print {
   .main-nav,

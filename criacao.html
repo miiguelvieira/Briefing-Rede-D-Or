@@ -406,6 +406,10 @@
 
     <!-- ACTIONS -->
     <div class="form-actions">
+      <button type="button" class="btn btn-submit" id="btnEnviarChamado" onclick="enviarChamado()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        Enviar Chamado
+      </button>
       <button type="button" class="btn btn-preview" onclick="openPreview()">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
         Visualizar e-mail
@@ -473,6 +477,28 @@
         </div>
       </div>
     </div>
+  </div>
+</div>
+
+<!-- MODAL SUCESSO -->
+<div class="modal-overlay" id="successModal">
+  <div class="modal success-modal">
+    <div class="success-icon">✅</div>
+    <h2>Chamado aberto com sucesso!</h2>
+    <p class="success-protocol" id="successProtocol"></p>
+    <p class="success-responsible">Responsável: <strong>Leonardo Achilles</strong> — Design &amp; Criação</p>
+    <p class="success-hint">Envie o briefing por e-mail ao responsável:</p>
+    <div class="success-actions">
+      <button class="btn btn-outlook" onclick="shareOutlook(); closeSuccess()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="white"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+        Enviar via Outlook
+      </button>
+      <button class="btn btn-gmail" onclick="shareGmail(); closeSuccess()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="white"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm-9 8.5L4 8V6.5l7 4.5 7-4.5V8l-7 4.5z"/></svg>
+        Enviar via Gmail
+      </button>
+    </div>
+    <button class="btn btn-ghost" onclick="closeSuccess()">Fechar</button>
   </div>
 </div>
 
@@ -714,6 +740,26 @@ Acompanhe sua solicitação com o protocolo: ${protocol}`;
       });
     } catch(e) { console.error('Persist ticket error:', e); }
   }
+
+  async function enviarChamado() {
+    if (!validateRequired()) return;
+    const btn = document.getElementById('btnEnviarChamado');
+    btn.disabled = true;
+    btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Enviando...';
+    await persistTicketIfLoggedIn();
+    btn.disabled = false;
+    btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> Enviar Chamado';
+    document.getElementById('successProtocol').textContent = protocol;
+    document.getElementById('successModal').classList.add('open');
+  }
+
+  function closeSuccess() {
+    document.getElementById('successModal').classList.remove('open');
+  }
+
+  document.getElementById('successModal').addEventListener('click', function(e) {
+    if (e.target === this) closeSuccess();
+  });
 
   // Close modal clicking overlay
   document.getElementById('modalOverlay').addEventListener('click', function(e) {
