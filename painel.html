@@ -1571,7 +1571,8 @@ document.getElementById('dpBtnSend').addEventListener('click', async () => {
     document.getElementById('dpFileName').textContent = '';
     await _dpLoadComments(ticketId);
   } catch(e) {
-    alert('Erro ao enviar comentário. Verifique se o Firebase Storage está ativado.');
+    console.error('Comment upload error:', e);
+    alert('Erro ao enviar comentário: ' + (e.message || 'Verifique as permissões do Firebase.'));
   } finally {
     btn.disabled = false;
     btn.textContent = 'Enviar comentário';
