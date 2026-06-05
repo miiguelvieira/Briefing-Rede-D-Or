@@ -363,6 +363,20 @@
       </div>
     </div>
 
+    <!-- Seção de Anexos -->
+    <div class="form-section">
+      <div class="section-title">Anexos <span class="section-hint">opcional · até 5 arquivos · 10 MB cada</span></div>
+      <div class="field">
+        <div class="upload-zone" id="uploadZone">
+          <input type="file" id="fileInput" multiple style="display:none" onchange="handleFiles(this.files)">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          <span class="upload-label">Clique ou arraste arquivos aqui</span>
+          <span class="upload-hint">PDF, imagem, apresentação...</span>
+        </div>
+        <div id="fileList"></div>
+      </div>
+    </div>
+
     <div class="form-actions">
       <button type="button" class="btn btn-submit" id="btnEnviarChamado" onclick="enviarChamado()">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
@@ -675,7 +689,45 @@ Acompanhe sua solicitação com o protocolo: ${protocol}`;
     setTimeout(() => t.classList.remove('show'), 3000);
   }
 
-  async function persistTicketIfLoggedIn() {
+  // ── Anexos ───────────────────────────────────────────────────────────────
+  let selectedFiles = [];
+
+  function handleFiles(newFiles) {
+    for (const file of newFiles) {
+      if (selectedFiles.length >= 5) { showToast('⚠️ Máximo de 5 arquivos atingido.'); break; }
+      if (file.size > 10 * 1024 * 1024) { showToast(`⚠️ "${file.name}" excede 10 MB.`); continue; }
+      if (selectedFiles.find(f => f.name === file.name && f.size === file.size)) continue;
+      selectedFiles.push(file);
+    }
+    renderFileList();
+  }
+
+  function removeFile(idx) {
+    selectedFiles.splice(idx, 1);
+    renderFileList();
+  }
+
+  function renderFileList() {
+    const container = document.getElementById('fileList');
+    if (!selectedFiles.length) { container.innerHTML = ''; return; }
+    container.innerHTML = selectedFiles.map((f, i) => `
+      <div class="file-chip">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        <span class="file-chip-name">${f.name}</span>
+        <span class="file-chip-size">${(f.size/1024/1024).toFixed(1)} MB</span>
+        <button class="file-chip-remove" onclick="removeFile(${i})" type="button">✕</button>
+      </div>`).join('');
+  }
+
+  (function setupUploadZone() {
+    const zone = document.getElementById('uploadZone');
+    zone.addEventListener('click', () => document.getElementById('fileInput').click());
+    zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag-over'); });
+    zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+    zone.addEventListener('drop', e => { e.preventDefault(); zone.classList.remove('drag-over'); handleFiles(e.dataTransfer.files); });
+  })();
+
+  async function persistTicketIfLoggedIn(attachments = []) {
     try {
       const session = await window._authReady;
       if (!session) return;
@@ -691,19 +743,42 @@ Acompanhe sua solicitação com o protocolo: ${protocol}`;
         createdAt: nowIso, updatedAt: nowIso,
         deadline: prazoVal ? new Date(prazoVal).toISOString() : null,
         resolvedAt: null, slaStatus: 'no_prazo',
+        attachments: attachments,
         history: [{ date: nowIso, status: 'aberto', note: 'Ticket aberto via briefing de patrocínio.', author: session.name }],
       });
     } catch(e) { console.error('Persist ticket error:', e); }
   }
 
+  const SEND_ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>';
+
   async function enviarChamado() {
     if (!validateRequired()) return;
     const btn = document.getElementById('btnEnviarChamado');
     btn.disabled = true;
-    btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Enviando...';
-    await persistTicketIfLoggedIn();
+
+    let attachments = [];
+    if (selectedFiles.length > 0) {
+      try {
+        const session = await window._authReady;
+        if (session && storage) {
+          for (let i = 0; i < selectedFiles.length; i++) {
+            const file = selectedFiles[i];
+            btn.textContent = `Enviando arquivo ${i + 1}/${selectedFiles.length}...`;
+            const ref = storage.ref(`attachments/${protocol}/${file.name}`);
+            await ref.put(file);
+            const url = await ref.getDownloadURL();
+            attachments.push({ name: file.name, url, size: file.size });
+          }
+        }
+      } catch(e) {
+        console.error('Upload error:', e);
+        showToast('⚠️ Erro ao enviar arquivo. Chamado será aberto sem o anexo.');
+      }
+    }
+
+    await persistTicketIfLoggedIn(attachments);
     btn.disabled = false;
-    btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> Enviar Chamado';
+    btn.innerHTML = SEND_ICON + ' Enviar Chamado';
     document.getElementById('successProtocol').textContent = protocol;
     document.getElementById('successModal').classList.add('open');
   }

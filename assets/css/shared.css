@@ -363,6 +363,64 @@
 }
 .btn-ghost:hover { background: var(--surface-2); }
 
+/* ── FILE UPLOAD ────────────────────────────────────────────────────────── */
+.section-hint {
+  font-weight: 400;
+  font-size: .78rem;
+  color: var(--muted);
+  margin-left: .4rem;
+}
+.upload-zone {
+  border: 2px dashed var(--border);
+  border-radius: var(--radius-sm);
+  padding: 1.5rem 1rem;
+  cursor: pointer;
+  transition: border-color .2s, background .2s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .35rem;
+  color: var(--muted);
+}
+.upload-zone:hover,
+.upload-zone.drag-over {
+  border-color: var(--accent);
+  background: rgba(168, 85, 247, .05);
+  color: var(--text);
+}
+.upload-label { font-size: .88rem; font-weight: 500; color: var(--text); }
+.upload-hint  { font-size: .78rem; color: var(--muted); }
+
+#fileList { display: flex; flex-wrap: wrap; gap: .4rem; margin-top: .5rem; }
+.file-chip {
+  display: flex;
+  align-items: center;
+  gap: .35rem;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: .3rem .6rem;
+  font-size: .8rem;
+  color: var(--text);
+}
+.file-chip-name {
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.file-chip-size { color: var(--muted); font-size: .75rem; }
+.file-chip-remove {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--muted);
+  padding: 0 2px;
+  line-height: 1;
+  font-size: .8rem;
+}
+.file-chip-remove:hover { color: #ef4444; }
+
 /* ── PRINT STYLES ───────────────────────────────────────────────────────── */
 @media print {
   .main-nav,
